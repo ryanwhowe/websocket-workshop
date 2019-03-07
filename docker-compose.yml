@@ -1,0 +1,24 @@
+version: "3"
+services:
+
+#  redis:
+#    image: redis:alpine
+#    ports:
+#      - "6379"
+  crossbar_1:
+    build: docker/crossbar
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./lesson-1:/app
+    environment:
+      - TZ=Europe/London
+  http_1:
+    image: httpd:2.4
+    ports:
+      - "8081:80"
+    volumes:
+      - ./lesson-1/public:/usr/local/apache2/htdocs/
+    environment:
+      - TZ=Europe/London
+
