@@ -56,6 +56,10 @@ var alreet = (function (){
 	}
 
 	function setRealm(realmName){
+		if (!realmName){
+			throw "You need to pass a valid string as the realm name"
+		}
+
 		realm = realmName;
 	}
 
