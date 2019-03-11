@@ -1,6 +1,13 @@
+# IDEs
 .idea/
+
+# Crossbar makes these
 key.priv
 key.pub
 node.pid
+
+# Composer
 /vendor/
+
+# Our custom logs dir for crossbar
 logs/
