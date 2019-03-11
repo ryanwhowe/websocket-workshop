@@ -1,0 +1,12 @@
+{
+    "name": "m1ke/phpyorkshire-workshop",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "m1ke",
+            "email": "mike@m1ke.me"
+        }
+    ],
+    "require": {}
+}
