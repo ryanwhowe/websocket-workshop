@@ -1,9 +1,11 @@
-console.log("Hi, welcome to the tutorial. We're not going to get bogged down in interface today" +
-	" - learning in command line, code and console will teach us more about the principles and we'll" +
-	" see how to hook this into an application later.");
+console.log("Hi, welcome to the tutorial. We're not going to get bogged down in interface today;\n" +
+	"learning in command line, code and console will teach us more about the principles and we'll\n" +
+	"see how to hook this into an application later. Our first script will create a connection\n" +
+	"object and then");
 
+var url = "ws://localhost:8001/ws";
 var connection = new autobahn.Connection({
-	url: "ws://localhost:8001/ws",
+	url: url,
 	realm: "phpyorkshire"
 });
 
@@ -26,6 +28,7 @@ connection.onclose = function (reason, details) {
 		" so we can see what happened. Here's the reason (details after):", reason, details);
 };
 
+console.log("Our websocket connection callbacks are created, so now we try to connect:");
 connection.open();
 
 /*

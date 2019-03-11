@@ -24,6 +24,4 @@ RUN chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["crossbar", "start"]
-
-
+CMD ["crossbar", "start" , "--logdir=/app/logs/", "--logtofile"]
