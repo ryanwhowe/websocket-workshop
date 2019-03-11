@@ -8,5 +8,7 @@
             "email": "mike@m1ke.me"
         }
     ],
-    "require": {}
+    "require": {
+        "voryx/thruway": "^0.5.3"
+    }
 }
