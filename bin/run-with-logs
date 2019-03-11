@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+lesson=$1
+
+if [ -z $lesson ]; then
+    echo "You must enter a lesson number as the first argument"
+    exit 1
+fi
+
+echo "Will build and run containers; this could take a while"
+echo ""
+
+docker-compose up -d
+
+echo ""
+echo "Will now tail -f logs for crossbar on lesson $lesson, press Ctrl+c to exit"
+echo ""
+
+log_file="lesson-$lesson/logs/node.log"
+timeout=10
+count=0
+while [ ! -f "$log_file" ] && [ $count<$timeout ]; do
+    sleep 1
+    count=count + 1
+done
+
+tail -f "$log_file"
