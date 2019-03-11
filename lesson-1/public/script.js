@@ -1,4 +1,4 @@
-console.log("Hi, welcome to the tutorial. We're not going to get bogged down in interface today;\n" +
+console.log("Hi, welcome to the tutorial (lesson 1). We're not going to get bogged down in interface today;\n" +
 	"learning in command line, code and console will teach us more about the principles and we'll\n" +
 	"see how to hook this into an application later. Our first script will create a connection\n" +
 	"object and then expose the session for us to play around with");
@@ -30,12 +30,3 @@ connection.onclose = function (reason, details) {
 
 console.log("Our websocket connection callbacks are created, so now we try to connect:");
 connection.open();
-
-/*
-	E.g
-
- session.subscribe('test', function(){ console.log('Got a message, args were: ', arguments); })
-
- session.publish('test', ['abc'], {}, {exclude_me: false});
-
- */

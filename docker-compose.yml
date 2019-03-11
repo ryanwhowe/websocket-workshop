@@ -7,7 +7,7 @@ services:
   crossbar_1:
     build: docker/crossbar
     ports:
-      - "8001:8001"
+      - "8001:8000"
     volumes:
       - ./lesson-1:/app
     environment:
@@ -18,6 +18,22 @@ services:
       - "8081:80"
     volumes:
       - ./lesson-1/public:/usr/local/apache2/htdocs/
+    environment:
+      - TZ=Europe/London
+  crossbar_2:
+    build: docker/crossbar
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./lesson-2:/app
+    environment:
+      - TZ=Europe/London
+  http_2:
+    image: httpd:2.4
+    ports:
+      - "8082:80"
+    volumes:
+      - ./lesson-2/public:/usr/local/apache2/htdocs/
     environment:
       - TZ=Europe/London
 

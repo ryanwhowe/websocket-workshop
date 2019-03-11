@@ -35,7 +35,7 @@
           "paths": {
             "ws": {
               "type": "websocket",
-              "url": "ws://localhost:8001/ws",
+              "url": "ws://localhost:8002/ws",
               "auth": {
                 "anonymous": {
                   "type": "static",

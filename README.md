@@ -138,7 +138,11 @@ or calling a procedure that doesn't exist. What arguments can you send to a proc
 
 In this section we will cover:
 
+* Why you want authentication in WAMP
+* Crossbar authentication types
+* Static vs dynamic authentication
 
+### Lesson 2 Practical - 
 
 ## 3. Websockets in PHP
 
