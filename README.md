@@ -125,7 +125,7 @@ Let's call that function:
 
 ```
 session.call("test", [1, 'abc']).then(function(){
-  console.log('Procedure caller says: I got an answer with arguements: ', arguments);
+  console.log('Procedure caller says: I got an answer with arguments: ', arguments);
 }, function(){
   console.log('Procedure caller says: Oh no, calling went wrong. I got these arguments: ', arguments);
 });
@@ -142,7 +142,19 @@ In this section we will cover:
 * Crossbar authentication types
 * Static vs dynamic authentication
 
-### Lesson 2 Practical - 
+### Lesson 2 Practical - Realms & Permissions
+
+For this exercise visit http://localhost:8082/
+
+The previous commands were verbose so they've been included in a helper object. This is PHP
+Yorkshire so you can call commands on the object using `alreet.pub()`, `alreet.sub()` etc.
+
+We now also have the option to change the realm to which we are connected. Call `alreet.setRealm()`
+with a string argument and then `alreet.connectAgain()` to close the connection and connect again
+with a new realm (or just modify the script in `lesson-2/public/script.js` and refresh the page.
+
+If you try this with anything other than "phpyorkshire" you'll get an error. Let's look at the
+Crossbar config in `.crossbar/config.json`
 
 ## 3. Websockets in PHP
 
