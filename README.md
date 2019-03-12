@@ -59,7 +59,7 @@ The container is running crossbar with debug logs enabled. This is not recommend
 even a moderately used system you can fairly quickly fill your disk or cause your file system to fall
 over) but gives us a good insight into what's happening as we test the system.
 
-View this example at http://localhost:8081/ (if you want to see the HTTP logs for any reason
+View this example at http://localhost:8081/1/ (if you want to see the HTTP logs for any reason
 you can do so by running `docker-compose logs -f http_1`)
 
 Open the browser console; you should see some instructions and info about the script we're using.
@@ -144,7 +144,7 @@ In this section we will cover:
 
 ### Lesson 2 Practical - Realms & Permissions
 
-For this exercise visit http://localhost:8082/
+For this exercise visit http://localhost:8081/2/
 
 The previous commands were verbose so they've been included in a helper object. This is PHP
 Yorkshire so you can call commands on the object using `alreet.pub()`, `alreet.sub()` etc.

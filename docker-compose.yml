@@ -12,12 +12,12 @@ services:
       - ./lesson-1:/app
     environment:
       - TZ=Europe/London
-  http_1:
+  http:
     image: httpd:2.4
     ports:
       - "8081:80"
     volumes:
-      - ./lesson-1/public:/usr/local/apache2/htdocs/
+      - ./public:/usr/local/apache2/htdocs/
     environment:
       - TZ=Europe/London
   crossbar_2:
@@ -28,12 +28,14 @@ services:
       - ./lesson-2:/app
     environment:
       - TZ=Europe/London
-  http_2:
-    image: httpd:2.4
+  crossbar_3:
+    build: docker/crossbar
     ports:
-      - "8082:80"
+      - "8003:8000"
     volumes:
-      - ./lesson-2/public:/usr/local/apache2/htdocs/
+      - ./lesson-3/.crossbar:/app/.crossbar
+      - ./lesson-3/logs:/app/logs
+      - ./vendor/:/app/vendor
     environment:
       - TZ=Europe/London
 
