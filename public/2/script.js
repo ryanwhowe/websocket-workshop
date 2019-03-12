@@ -2,8 +2,12 @@ console.log("Welcome to lesson 2");
 
 var alreet = (function (){
 	var session, connection;
-	const url = "ws://localhost:8002/ws";
-	var realm = 'phpyorkshire';
+	const url = "ws://localhost:8003/ws";
+
+	var config = {
+		realm: 'yorkshire',
+		auth: ['anonymous']
+	};
 
 	function setSession(openedSession){
 		session = openedSession;
@@ -55,17 +59,43 @@ var alreet = (function (){
 		});
 	}
 
-	function setRealm(realmName){
-		if (!realmName){
-			throw "You need to pass a valid string as the realm name"
+	function setRealm(realm){
+		if (!realm){
+			throw "You need to pass a valid string as the 'realm' parameter";
 		}
 
-		realm = realmName;
+		config.realm = realm;
+
+		return singleton;
+	}
+
+	function setConfig(userConfig){
+		if (!userConfig.realm){
+			throw "You need to pass a valid string as the 'realm' field";
+		}
+		if (!userConfig.authmethods || userConfig.authmethods.length<1){
+			throw "You need to pass a valid array of strings as the 'auth' field";
+		}
+		userConfig.authmethods.map(function(method){
+			if (['ticket', 'wampcra'].indexOf(method)>-1){
+				if (!userConfig.authid){
+					throw "You must specify a truthy value as the 'authid' field";
+				}
+				if (!userConfig.onchallenge || typeof userConfig.onchallenge!=='function'){
+					throw "You must specify a callback function(session, method, extra) as the 'onchallenge' field";
+				}
+			}
+		});
+
+		config = userConfig;
+
+		return singleton;
 	}
 
 	function connectAgain(){
 		if (!connection || !connection.isConnected){
-			return connect(true);
+			connect(true);
+			return;
 		}
 
 		connection.close();
@@ -77,15 +107,15 @@ var alreet = (function (){
 			console.log("Already connected, use .connectAgain method to close and reconnect");
 			return;
 		}
+		const realm = config.realm;
+		const auth = config.authmethods;
 
-		connection = new autobahn.Connection({
-			url: url,
-			realm: realm
-		});
+		config.url = url;
+		connection = new autobahn.Connection(config);
 
-		connection.onopen = function (openedSession){
+		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
-			console.log("Websocket connection open to realm "+realm+". Call methods on the 'alreet' object to continue");
+			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
 		};
 
 		connection.onclose = function (reason, details){
@@ -95,11 +125,12 @@ var alreet = (function (){
 				"so we can see what happened. Here's the reason (details after):", reason, details);
 		};
 
-		console.log("Connecting to websocket server"+(again ? ' again' : '')+":");
+		console.log("Connecting to websocket server"+(again ? ' again' : '')+" (realm is "+realm+", using auth "+JSON.stringify(auth)+"):");
 		connection.open();
 	}
 
-	return {
+	const singleton = {
+		setConfig: setConfig,
 		setRealm: setRealm,
 		pub: pub,
 		publish: pub,
@@ -110,7 +141,9 @@ var alreet = (function (){
 		register: reg,
 		connect: connect,
 		connectAgain: connectAgain
-	}
+	};
+
+	return singleton;
 })();
 
 alreet.connect();

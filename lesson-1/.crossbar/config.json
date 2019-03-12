@@ -6,7 +6,7 @@
       "type": "router",
       "realms": [
         {
-          "name": "phpyorkshire",
+          "name": "yorkshire",
           "roles": [
             {
               "name": "guest",

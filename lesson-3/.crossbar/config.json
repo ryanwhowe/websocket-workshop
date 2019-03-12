@@ -6,7 +6,7 @@
       "type": "router",
       "realms": [
         {
-          "name": "phpyorkshire",
+          "name": "yorkshire",
           "roles": [
             {
               "name": "guest",
@@ -18,6 +18,39 @@
                     "register": true,
                     "publish": true,
                     "subscribe": true
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "lancashire",
+          "roles": [
+            {
+              "name": "workman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": true,
+                    "register": false,
+                    "publish": false,
+                    "subscribe": true
+                  }
+                }
+              ]
+            },
+            {
+              "name": "foreman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": false,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": false
                   }
                 }
               ]
@@ -40,6 +73,19 @@
                 "anonymous": {
                   "type": "static",
                   "role": "guest"
+                },
+                "wampcra": {
+                  "type": "static",
+                  "users": {
+                    "barry": {
+                      "secret": "notsosecret",
+                      "role": "workman"
+                    },
+                    "steve": {
+                      "secret": "slightlymoresecret",
+                      "role": "foreman"
+                    }
+                  }
                 }
               }
             }

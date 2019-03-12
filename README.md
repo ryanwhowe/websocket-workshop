@@ -60,10 +60,10 @@ even a moderately used system you can fairly quickly fill your disk or cause you
 over) but gives us a good insight into what's happening as we test the system.
 
 View this example at http://localhost:8081/1/ (if you want to see the HTTP logs for any reason
-you can do so by running `docker-compose logs -f http_1`)
+you can do so by running `docker-compose logs -f http`)
 
 Open the browser console; you should see some instructions and info about the script we're using.
-View this file in `lesson-1/public/script.js` (all the lessons will have this file)
+View this file in `public/1/script.js` (all the lessons will have this file)
 
 #### Pub-sub
 
@@ -151,10 +151,113 @@ Yorkshire so you can call commands on the object using `alreet.pub()`, `alreet.s
 
 We now also have the option to change the realm to which we are connected. Call `alreet.setRealm()`
 with a string argument and then `alreet.connectAgain()` to close the connection and connect again
-with a new realm (or just modify the script in `lesson-2/public/script.js` and refresh the page.
+with a new realm (or just modify the script in `public/2/script.js` and refresh the page.
 
-If you try this with anything other than "phpyorkshire" you'll get an error. Let's look at the
-Crossbar config in `.crossbar/config.json`
+If you try this with anything other than "yorkshire" you'll get an error. Let's look at the
+Crossbar config in `lesson-2/.crossbar/config.json`
+
+_Our next bit will be on the screen_
+
+### Lesson 2 Practical - Adding Permissions
+
+Look in `.crossbar/config.json` and find the `realms` field of the first worker (it will have `type`
+set to "router"). We are going to add another realm to show how realms/users are split.
+
+```
+{
+  "name": "lancashire",
+  "roles": [
+    {
+      "name": "workman",
+      "permissions": [
+        {
+          "uri": "*",
+          "allow": {
+            "call": true,
+            "register": false,
+            "publish": false,
+            "subscribe": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "foreman",
+      "permissions": [
+        {
+          "uri": "*",
+          "allow": {
+            "call": false,
+            "register": true,
+            "publish": true,
+            "subscribe": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+To allow sign-in to this realm add the following as a new field in the `auth` key of
+the object at `transporsts[0].paths.ws`. The authenticator types are defined by their field names,
+as only one of each type of authenticator is allowed.
+
+```
+"ticket": {
+  "type": "static",
+  "principals": {
+    "barry": {
+      "ticket": "notsosecret",
+      "role": "workman"
+    },
+    "steve": {
+      "ticket": "slightlymoresecret",
+      "role": "foreman"
+    }
+  }
+}
+```
+
+Any time we make changes to `config.json` (and we'll be doing that a fair bit) we need to restart
+our crossbar servers. The easiest way is to restart the whole docker compose setup with 
+`docker-compose restart` but we can name a service if  we want: `docker-compose restart crossbar_2`
+
+Now refresh the webpage and run the following code in the console.
+
+```
+alreet.setConfig({
+  realm:'lancashire',
+  authmethods: ['ticket'],
+  onchallenge: function(session, method, extra){
+    return 'notsosecret';
+  },
+  authid: 'barry'
+}).connectAgain();
+```
+
+The console message should show that you're no longer a guest - you're now a workman. Try out the pub-sub and
+RPC methods we've already used as a guest and you'll see your permissions are now more restrictive. Open a new
+tab, and with the above code, change the `authid` to "steve" and return value of the `onchallenge` function to
+"slightlymoresecret" and try again (FYI it's not more secret, Steve is just naive).
+
+What's the problem with this authentication? Check the logs for the crossbar service: `bin/run-with-logs 2`
+You'll see that when an auth attempt is made the password is sent in plain text to the server. This will not
+seem like a problem with static authenticators, but in reality you'll tend to use dynamic ones and so will not
+want your user's authentication keys in plain text over a websocket connection (TLS mitigates this somewhat)
+
+We can secure this by making the following changes: ticket->wampcra, principals->users, ticket->secret
+
+```
+alreet.setConfig({
+  realm:'lancashire',
+  authmethods: ['wampcra'],
+  onchallenge: function(session, method, extra){
+    return autobahn.auth_cra.sign('slightlymoresecret', extra.challenge);
+  },
+  authid: 'steve'
+}).connectAgain();
+```
 
 ## 3. Websockets in PHP
 
