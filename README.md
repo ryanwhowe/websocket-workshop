@@ -248,6 +248,10 @@ want your user's authentication keys in plain text over a websocket connection (
 
 We can secure this by making the following changes: ticket->wampcra, principals->users, ticket->secret
 
+* Change the field name inside the path declaration from `ticket` to `wampcra`
+* Modify the array field name from `principals` to `users`
+* Within each entity (larry and steve) modify their `ticket` to `secret` - now these actually become secrets
+
 ```
 alreet.setConfig({
   realm:'lancashire',
@@ -259,11 +263,13 @@ alreet.setConfig({
 }).connectAgain();
 ```
 
+_We'll now discuss a few more authentication principles to finish_
+
 ## 3. Websockets in PHP
 
 In this section we will cover:
 
-
+* 
 
 ## 4. Dynamic authentication with workers
 

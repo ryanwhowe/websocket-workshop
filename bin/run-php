@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+php_file=$1
+
+docker-compose run php php "/app/$php_file" "${@:2}"

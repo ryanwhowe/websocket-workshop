@@ -33,9 +33,13 @@ services:
     ports:
       - "8003:8000"
     volumes:
-      - ./lesson-3/.crossbar:/app/.crossbar
-      - ./lesson-3/logs:/app/logs
-      - ./vendor/:/app/vendor
+      - ./lesson-3/router:/app
+    environment:
+      - TZ=Europe/London
+  php:
+    build: docker/php
+    volumes:
+      - ./lesson-3/php:/app
     environment:
       - TZ=Europe/London
 

@@ -2,11 +2,15 @@ console.log("Welcome to lesson 2");
 
 var alreet = (function (){
 	var session, connection;
-	const url = "ws://localhost:8002/ws";
+	const url = "ws://localhost:8003/ws";
 
 	var config = {
-		realm: 'yorkshire',
-		authmethods: ['anonymous']
+		realm: 'lancashire',
+		authmethods: ['wampcra'],
+		onchallenge: function(session, method, extra){
+			return autobahn.auth_cra.sign('slightlymoresecret', extra.challenge);
+		},
+		authid: 'steve'
 	};
 
 	function setSession(openedSession){
