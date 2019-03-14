@@ -48,12 +48,14 @@ services:
     build: docker/php
     volumes:
       - ./lesson-3/php:/app
+    network_mode: "host"
     environment:
       - TZ=Europe/London
   php_4:
     build: docker/php
     volumes:
       - ./lesson-4/php:/app
+    network_mode: "host"
     environment:
       - TZ=Europe/London
 

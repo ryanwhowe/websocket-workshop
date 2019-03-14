@@ -23,12 +23,13 @@ $onChallenge = function (ClientSession $session, $method, ChallengeMessage $msg)
 
 $connection = new Connection([
 	"realm" => 'lancashire',
-	"url" => 'ws://crossbar_3:8003',
+	"url" => 'ws://localhost:8003/ws',
 	"authmethods" => ["wampcra"],
 	"onChallenge" => $onChallenge,
 	"authid" => $user,
 ]);
 
+$connection->getClient()->setAttemptRetry(false);
 $connection->on('open', function (ClientSession $session){
 	echo "Connection opened\n";
 });
