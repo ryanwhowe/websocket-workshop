@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-php_file=$1
+lesson=$1
+php_file=$2
 
-docker-compose run php php "/app/$php_file" "${@:2}"
+docker-compose run "php_$lesson" php "/app/$php_file" "${@:3}"

@@ -1,7 +1,19 @@
-# Start with a base image
-FROM python:3-slim
+FROM composer AS composer
 
-LABEL name="phpyorkshire/crossbar"
+COPY composer.* /app/
+
+RUN composer install
+
+FROM php:7.2-cli
+
+COPY . .
+
+COPY --from=composer /app/vendor/ vendor/
+
+LABEL name="phpyorkshire/crossbar-php"
+
+# We need python as well so lets merge the python 3-slim image
+COPY --from=python:3-slim / /
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -10,6 +22,7 @@ RUN apt-get update \
         build-essential \
         libssl-dev \
         libffi-dev \
+        libzmq3-dev \
     && pip install --no-cache-dir --upgrade pip \
     && pip install crossbar \
     && apt-get remove -y build-essential \
@@ -18,6 +31,10 @@ RUN apt-get update \
 
 # Test crossbar works, means we can exit early if not
 RUN crossbar version
+
+# We need to install and enable the zmq php extension
+RUN pecl install zmq-beta && \
+    docker-php-ext-enable zmq
 
 WORKDIR /app
 

@@ -36,10 +36,24 @@ services:
       - ./lesson-3/router:/app
     environment:
       - TZ=Europe/London
-  php:
+  crossbar_4:
+    build: docker/crossbar-php
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./lesson-4/router:/app
+    environment:
+      - TZ=Europe/London
+  php_3:
     build: docker/php
     volumes:
       - ./lesson-3/php:/app
+    environment:
+      - TZ=Europe/London
+  php_4:
+    build: docker/php
+    volumes:
+      - ./lesson-4/php:/app
     environment:
       - TZ=Europe/London
 

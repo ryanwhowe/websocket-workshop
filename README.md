@@ -20,6 +20,10 @@
 * tail (seriously surprised if you're missing this)
 * IDE or similar (you'll be reading this README a lot so markdown highlighting will help!)
 
+_Pro-tip: I discovered long ago you can make it easy to add helper scripts to any environment
+by adding "./bin" to your `$PATH` variable. If you do that then the `bin/run-*` commands in this
+tutorial just become `run-*` saving you FOUR whole characters. Priceless_
+
 ## 0. Introduction & real time web principles
 
 In this section we will cover:
@@ -269,7 +273,13 @@ _We'll now discuss a few more authentication principles to finish_
 
 In this section we will cover:
 
-* 
+* What's actually under the hood of websockets
+* Making websocket connections in PHP
+* How can PHP be used to create persistent applications
+
+### Lesson 3 Practical - Talking to ourselves
+
+
 
 ## 4. Dynamic authentication with workers
 

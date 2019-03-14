@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__.'/../vendor/autoload.php';
+
 $args = array_splice($argv, 1);
 
 echo "Hello. This is an example script";
