@@ -54,6 +54,20 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "salesman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": false,
+                    "register": false,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
             }
           ]
         }
@@ -84,6 +98,10 @@
                     "steve": {
                       "secret": "slightlymoresecret",
                       "role": "foreman"
+                    },
+                    "alan": {
+                      "secret": "definitelysecret",
+                      "role": "salesman"
                     }
                   }
                 }

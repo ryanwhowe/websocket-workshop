@@ -16,7 +16,7 @@ var alreet = (function (){
 	function pub(name, args){
 		name = name || "test";
 		args = args || ['abc', 1];
-		session.publish(name, args, {}, {exclude_me: false}).then(function (){
+		session.publish(name, args, {}, {exclude_me: false, acknowledge: true}).then(function (){
 			console.log('Publisher says: Yes, published to '+name+'!');
 		}, function (){
 			console.log('Publisher says: Oh no, publishing to '+name+' went wrong. I got these arguments: ', arguments);

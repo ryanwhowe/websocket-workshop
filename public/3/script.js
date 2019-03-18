@@ -1,4 +1,4 @@
-console.log("Welcome to lesson 2");
+console.log("Welcome to lesson 3");
 
 var alreet = (function (){
 	var session, connection;
@@ -8,29 +8,29 @@ var alreet = (function (){
 		realm: 'lancashire',
 		authmethods: ['wampcra'],
 		onchallenge: function(session, method, extra){
-			return autobahn.auth_cra.sign('slightlymoresecret', extra.challenge);
+			return autobahn.auth_cra.sign('definitelysecret', extra.challenge);
 		},
-		authid: 'steve'
+		authid: 'alan'
 	};
 
 	function setSession(openedSession){
 		session = openedSession;
 	}
 
-	function pub(name, args){
+	function pub(args, name){
 		name = name || "test";
 		args = args || ['abc', 1];
-		session.publish(name, args, {}, {exclude_me: false}).then(function (){
+		session.publish(name, args, {}, {exclude_me: true, acknowledge: true}).then(function (){
 			console.log('Publisher says: Yes, published to '+name+'!');
 		}, function (){
 			console.log('Publisher says: Oh no, publishing to '+name+' went wrong. I got these arguments: ', arguments);
 		});
 	}
 
-	function sub(name, func){
+	function sub(func, name){
 		name = name || "test";
-		func = func || function (){
-			console.log('Subscriber says: Got a message, args were: ', arguments);
+		func = func || function (args){
+			console.log('Subscriber says: Got a message, it said: '+args.join(' '));
 		};
 		session.subscribe(name, func).then(function (){
 			console.log('Subscriber says: Yes, subscribed to '+name+'!');
@@ -39,7 +39,7 @@ var alreet = (function (){
 		});
 	}
 
-	function call(name, args){
+	function call(args, name){
 		name = name || "test";
 		args = args || ['abc', 1];
 		session.call(name, args).then(function (){
@@ -49,7 +49,7 @@ var alreet = (function (){
 		});
 	}
 
-	function reg(name, func){
+	function reg(func, name){
 		name = name || "test";
 		func = func || function (){
 			console.log('Call provider says: someone called me with arguments:', arguments);
@@ -96,17 +96,19 @@ var alreet = (function (){
 		return singleton;
 	}
 
-	function connectAgain(){
+	function connectAgain(callback){
 		if (!connection || !connection.isConnected){
-			connect(true);
+			connect(true, callback);
 			return;
 		}
 
 		connection.close();
-		setTimeout(connectAgain, 100);
+		setTimeout(function(){
+			connectAgain(callback);
+		}, 100);
 	}
 
-	function connect(again){
+	function connect(again, callback){
 		if (connection && connection.isConnected){
 			console.log("Already connected, use .connectAgain method to close and reconnect");
 			return;
@@ -120,6 +122,10 @@ var alreet = (function (){
 		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
 			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
+
+			if (typeof callback==='function'){
+				callback(openedSession, details);
+			}
 		};
 
 		connection.onclose = function (reason, details){
@@ -150,4 +156,6 @@ var alreet = (function (){
 	return singleton;
 })();
 
-alreet.connect();
+alreet.connect(false, function(){
+	alreet.sub();
+});
