@@ -17,10 +17,12 @@ function terminal_log(string $msg){
 
 Logger::set(new NullLogger());
 
-$user = 'alan';
-$password = 'definitelysecret';
+define('USER', 'alan');
+define('PASSWORD', 'definitelysecret');
 
-$onChallenge = function (ClientSession $session, $method, ChallengeMessage $msg) use ($user, $password){
+$onChallenge = function (ClientSession $session, $method, ChallengeMessage $msg){
+	$user = USER;
+	$password = PASSWORD;
 	terminal_log("Responding to challenge as user '$user' with password '$password'");
 	if ("wampcra"!==$method){
 		return false;
@@ -36,7 +38,7 @@ $connection = new Connection([
 	"url" => 'ws://localhost:8003/ws',
 	"authmethods" => ["wampcra"],
 	"onChallenge" => $onChallenge,
-	"authid" => $user,
+	"authid" => USER,
 ]);
 
 $connection->on('open', function (ClientSession $session, $details){

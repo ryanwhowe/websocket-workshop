@@ -274,12 +274,171 @@ _We'll now discuss a few more authentication principles to finish_
 In this section we will cover:
 
 * What's actually under the hood of websockets
-* Making websocket connections in PHP
 * How can PHP be used to create persistent applications
+* Making websocket connections in PHP
 
 ### Lesson 3 Practical - Talking to ourselves
 
+To learn how websockets work in PHP we can create a client which responds to actions we can perform via
+the browser. The first step is that we need to get around PHP's normal mode of operation in which a
+script begins execution at the top, continues to the bottom and then exits.
 
+Have a look at `lesson-3/php/client.php`. This contains a very simple mechanism used as the underlying
+mechanism for lower level languages to continue running as a process - a never-ending while loop. To avoid
+simply flooding the log file with prints the `sleep()` method is called to pause the process for a certain
+number of seconds. If we wanted to run faster we could remove the sleep and echo statements and we'd just
+have a PHP process running and doing nothing except counting up very fast in the while loop.
+
+Because the process is running inside a docker container we can view it using docker's log follow command:
+
+```
+docker-compose logs -f php_3
+```
+
+There is also a shortcut at `bin/run-php` which takes a single argument, the lesson number, and on running
+will restart the container then subsequently follow it's logs. Exit the log follow with `Ctrl+C`
+
+As fun as the loop is we need some content. Let's make a websocket connection. For this we're going to use
+a stack of PHP libraries that implement various parts of the process:
+
+* React PHP is a non-blocking event & socket library for PHP
+* Ratchet is a PHP WebSocket library allowing creation of clients and servers speaking over sockets
+* Thruway is basically Autobahn but in PHP with a similar API. It uses React & Ratchet under the hood
+
+Add some code to implement a websocket connection. You'll see close parity between this and the JavaScript
+written in previous lessons so we may move a bit faster.
+
+We can start by saving some time with our alias declarations:
+
+```
+use Psr\Log\NullLogger;
+use Thruway\Authentication\ClientWampCraAuthenticator;
+use Thruway\ClientSession;
+use Thruway\Connection;
+use Thruway\Logging\Logger;
+use Thruway\Message\ChallengeMessage;
+```
+
+We can also remove the existing `while (true)` loop before we add more to our client.
+
+Also for some reason the native Logger used by Thruway outputs debug logs to the container which can be
+handy but also obscures what we're actually doing.
+
+```
+Logger::set(new NullLogger());
+```
+
+We have a new user this time:
+
+```
+define('USER', 'alan');
+define('PASSWORD', 'definitelysecret');
+```
+
+Why not use the `.crossbar/config.json` file to see if you can work out their permissions?
+
+```
+$on_challenge = function (ClientSession $session, $method, ChallengeMessage $msg){
+    $user = USER;
+    $password = PASSWORD;
+    terminal_log("Responding to challenge as user '$user' with password '$password'");
+    if ("wampcra"!==$method){
+        return false;
+    }
+    
+    $cra = new ClientWampCraAuthenticator($user, $password);
+    
+    return $cra->getAuthenticateFromChallenge($msg)->getSignature();
+};
+   
+$connection = new Connection([
+    "realm" => 'lancashire',
+    "url" => 'ws://localhost:8003/ws',
+    "authmethods" => ["wampcra"],
+    "onChallenge" => $on_challenge,
+    "authid" => USER,
+]);
+
+$connection->open();
+```
+
+_Note: the PHP containers bind to your system network so they can must the WebSocket servers
+at the same port bound publicly, rather than the internal port on the container_
+
+If you run this now (`bin/run-php 3`) you should see the logs from the WampCRA authentication and then
+nothing else. Like with JS we need to add handlers to open and close events, and in the same way we
+receive a session object which we can use to carry out WAMP operations.
+
+Add this _before_ the connection open command.
+
+```
+$connection->on('open', function (ClientSession $session, $details){
+	terminal_log("Connection opened with role {$details->authrole}");
+});
+
+$connection->on('close', function(){
+	terminal_log("Connection closed, will keep trying to reconnect");
+});
+```
+
+If you restart and view logs again you should see the connection open. It's worth mentioning that whilst
+we removed the rather blunt `while (true)` loop there's still an event loop happening. When Thruway starts
+a connection it uses the React PHP Loop factory to create a loop that the connection runs inside of.
+
+This is how the library can be "non-blocking" - we can publish a message whilst also waiting to respond
+to a call whilst at the same time handling incoming subscriptions. The event loop takes care of that for us.
+
+Let's listen to what our JavaScript user is saying:
+
+```
+$topic = 'test';
+$session->subscribe($topic, function ($args) use ($topic){
+    terminal_log("Subscriber says: Received message '".implode(' ', $args)."'");
+})->then(function () use ($topic){
+    terminal_log("Subscriber says: I subscribed to topic '$topic'");
+});
+```
+
+Now once again restart the PHP container, check it's subscribed and head back to the browser.
+
+Visit `http://localhost:8081/3/` and open the console. The connection should already be established and
+there's some new helper functions so run `alreet.pub()` in the console. Check the PHP logs and you should
+see your message has been received by the PHP client.
+
+This conversation might be one-sided if we can only actively talk from one side. Let's make the bot respond. 
+Add `$session` inside the `use ()` block, and then add this inside the callback passed to the
+`subscribe()` method:
+
+```
+terminal_log("\tSending one back...");
+$session->publish($topic, ['I am a robot'], null, ['acknowledge' => true])->then(function (){
+    terminal_log("Publisher says: Sent, did you get it?");
+});
+```
+
+If we restart the PHP container and publish again from the browser we should see a message get sent
+back to us from the bot. If we wanted this could form the basis of an interactive chatbot - all that
+would remain is front end interface and back end intelligence - easy!
+
+Just to demonstrate all the features we can also have the PHP client register a procedure inside the
+on open handler:
+
+```
+$name = 'add';
+$session->register($name, function ($args){
+    terminal_log("Procedure says: Received parameters '".implode(', ', $args)."'");
+
+    $answer = array_sum($args);
+    terminal_log("\tSending the answer '$answer'...");
+
+    return $answer;
+})->then(function () use ($name){
+    terminal_log("Procedure says: I registered procedure '$name'");
+});
+```
+
+On the browser console run `alreet.call()` and the answer to our fiendish maths problem should be
+returned to us by the bot.
 
 ## 4. Dynamic authentication with workers
 
