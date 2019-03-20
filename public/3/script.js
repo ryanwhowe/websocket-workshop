@@ -8,9 +8,9 @@ var alreet = (function (){
 		realm: 'lancashire',
 		authmethods: ['wampcra'],
 		onchallenge: function(session, method, extra){
-			return autobahn.auth_cra.sign('definitelysecret', extra.challenge);
+			return autobahn.auth_cra.sign('whatdoessecretevenmean', extra.challenge);
 		},
-		authid: 'alan'
+		authid: 'arnold'
 	};
 
 	function setSession(openedSession){
@@ -40,21 +40,23 @@ var alreet = (function (){
 	}
 
 	function call(args, name){
-		name = name || "test";
-		args = args || ['abc', 1];
-		session.call(name, args).then(function (){
-			console.log('Procedure caller says: I got an answer to '+name+' with arguments: ', arguments);
+		name = name || "add";
+		args = args || [1, 2];
+		console.log(name, args);
+		session.call(name, args).then(function (res){
+			console.log('Procedure caller says: I got an answer to '+name+' which was: ', res);
 		}, function (){
 			console.log('Procedure caller says: Oh no, calling '+name+' went wrong. I got these arguments: ', arguments);
 		});
 	}
 
 	function reg(func, name){
-		name = name || "test";
-		func = func || function (){
-			console.log('Call provider says: someone called me with arguments:', arguments);
-			console.log('Call provider says: given I had nothing to contribute, I returned the number 1');
-			return 1;
+		name = name || "subtract";
+		func = func || function (args){
+			console.log('Call provider says: someone called me with parameters:', args);
+			return args.reduce(function(partial_sum, a){
+				return partial_sum - 1 * a;
+			});
 		};
 		session.register(name, func).then(function (){
 			console.log('Call provider says: Yes, registered procedure '+name+'!');
@@ -139,6 +141,10 @@ var alreet = (function (){
 		connection.open();
 	}
 
+	function getSession(){
+		return session;
+	}
+
 	const singleton = {
 		setConfig: setConfig,
 		setRealm: setRealm,
@@ -150,7 +156,8 @@ var alreet = (function (){
 		reg: reg,
 		register: reg,
 		connect: connect,
-		connectAgain: connectAgain
+		connectAgain: connectAgain,
+		getSession: getSession
 	};
 
 	return singleton;

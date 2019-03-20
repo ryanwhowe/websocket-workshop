@@ -9,13 +9,19 @@ use Thruway\Message\ChallengeMessage;
 
 require __DIR__.'/../vendor/autoload.php';
 
+function terminal_log(string $msg){
+	$date = date('Y-m-d H:i:s').'.'.explode('.', round(microtime(true), 2))[1];
+
+	echo "[$date] $msg\n";
+}
+
 Logger::set(new NullLogger());
 
 $user = 'alan';
 $password = 'definitelysecret';
 
 $onChallenge = function (ClientSession $session, $method, ChallengeMessage $msg) use ($user, $password){
-	echo "Responding to challenge as user '$user' with password '$password'\n";
+	terminal_log("Responding to challenge as user '$user' with password '$password'");
 	if ("wampcra"!==$method){
 		return false;
 	}
@@ -33,20 +39,35 @@ $connection = new Connection([
 	"authid" => $user,
 ]);
 
-$connection->getClient()->setAttemptRetry(false);
 $connection->on('open', function (ClientSession $session, $details){
-	echo "Connection opened with role {$details->authrole}\n";
+	terminal_log("Connection opened with role {$details->authrole}");
+
+	$name = 'add';
+	$session->register($name, function ($args){
+		terminal_log("Procedure says: Received parameters '".implode(', ', $args)."'");
+
+		$answer = array_sum($args);
+		terminal_log("\tSending the answer '$answer'...");
+
+		return $answer;
+	})->then(function () use ($name){
+		terminal_log("Procedure says: I registered procedure '$name'");
+	});
 
 	$topic = 'test';
 	$session->subscribe($topic, function ($args) use ($session, $topic){
-		echo "Subscriber says: Received message '".implode(' ', $args)."'\n";
-		echo "\tSending one back...\n";
+		terminal_log("Subscriber says: Received message '".implode(' ', $args)."'");
+		terminal_log("\tSending one back...");
 		$session->publish($topic, ['I am a robot'], null, ['acknowledge' => true])->then(function (){
-			echo "Publisher says: Sent, did you get it?\n";
+			terminal_log("Publisher says: Sent, did you get it?");
 		});
 	})->then(function () use ($topic){
-		echo "Subscriber says: I subscribed to topic '$topic'\n";
+		terminal_log("Subscriber says: I subscribed to topic '$topic'");
 	});
+});
+
+$connection->on('close', function(){
+	terminal_log("Connection closed, will keep trying to reconnect");
 });
 
 $connection->open();

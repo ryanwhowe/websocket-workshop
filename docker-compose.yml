@@ -51,6 +51,7 @@ services:
     network_mode: "host"
     environment:
       - TZ=Europe/London
+    command: php /app/client.php
   php_4:
     build: docker/php
     volumes:
@@ -58,4 +59,6 @@ services:
     network_mode: "host"
     environment:
       - TZ=Europe/London
+    command: php /app/client.php
+
 

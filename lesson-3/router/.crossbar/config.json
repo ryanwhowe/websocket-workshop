@@ -62,6 +62,20 @@
                   "uri": "*",
                   "allow": {
                     "call": false,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
+            },
+            {
+              "name": "customer",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": true,
                     "register": false,
                     "publish": true,
                     "subscribe": true
@@ -102,6 +116,10 @@
                     "alan": {
                       "secret": "definitelysecret",
                       "role": "salesman"
+                    },
+                    "arnold": {
+                      "secret": "whatdoessecretevenmean",
+                      "role": "customer"
                     }
                   }
                 }

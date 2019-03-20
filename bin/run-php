@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
 lesson=$1
-php_file=$2
+container="php_$lesson"
 
-docker-compose run "php_$lesson" php "/app/$php_file" "${@:3}"
+echo "Will restart the PHP container for lesson $lesson, then follow the logs. Please wait..."
+
+docker-compose restart "$container"
+
+echo "Container restarted, will now follow logs - press Ctrl+c to quit"
+
+log_cmd="docker-compose logs -f $container"
+eval "$log_cmd"
+
+echo "Ignore that error, we've just stopped watching the logs but your container is still running"
+echo "Run '$log_cmd' to watch without restarting again"
