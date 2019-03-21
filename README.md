@@ -452,7 +452,9 @@ _First some basics on how custom authenticators work_
 
 ### Lesson 4 Practical - Registering a custom authenticator
 
+### Lesson 4 Practical - Handling granular permissions
 
+### Lesson 4 Practical - Integration with existing auth mechanisms
 
 ## 5. Caching and listening
 
