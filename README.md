@@ -56,7 +56,7 @@ This will build some containers for you which will be pretty useful for the next
 Start containers and see logs from crossbar by running:
 
 ```
-bin/run-with-logs 1
+bin/run-crossbar 1
 ```
 
 The container is running crossbar with debug logs enabled. This is not recommended for production (on
@@ -158,7 +158,7 @@ with a string argument and then `alreet.connectAgain()` to close the connection 
 with a new realm (or just modify the script in `public/2/script.js` and refresh the page.
 
 If you try this with anything other than "yorkshire" you'll get an error. Let's look at the
-Crossbar config in `lesson-2/.crossbar/config.json`
+Crossbar config in `lesson-2/router/.crossbar/config.json`
 
 _Our next bit will be on the screen_
 
@@ -443,6 +443,14 @@ returned to us by the bot.
 ## 4. Dynamic authentication with workers
 
 In this section we will cover:
+
+* Using workers in Crossbar
+* How to communicate with a dynamic authenticator
+* Granular action permissions per role
+
+_First some basics on how custom authenticators work_
+
+### Lesson 4 Practical - Registering a custom authenticator
 
 
 

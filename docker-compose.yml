@@ -6,10 +6,11 @@ services:
 #      - "6379"
   crossbar_1:
     build: docker/crossbar
+    image: phpyorkshire/crossbar
     ports:
       - "8001:8000"
     volumes:
-      - ./lesson-1:/app
+      - ./lesson-1/router:/app
     environment:
       - TZ=Europe/London
   http:
@@ -22,14 +23,16 @@ services:
       - TZ=Europe/London
   crossbar_2:
     build: docker/crossbar
+    image: phpyorkshire/crossbar
     ports:
       - "8002:8000"
     volumes:
-      - ./lesson-2:/app
+      - ./lesson-2/router:/app
     environment:
       - TZ=Europe/London
   crossbar_3:
     build: docker/crossbar
+    image: phpyorkshire/crossbar
     ports:
       - "8003:8000"
     volumes:
@@ -38,24 +41,27 @@ services:
       - TZ=Europe/London
   crossbar_4:
     build: docker/crossbar-php
+    image: phpyorkshire/crossbar-php
     ports:
       - "8004:8000"
     volumes:
       - ./lesson-4/router:/app
     environment:
       - TZ=Europe/London
-  php_3:
-    build: docker/php
+  crossbar_5:
+    build: docker/crossbar-php
+    image: phpyorkshire/crossbar-php
+    ports:
+      - "8005:8000"
     volumes:
-      - ./lesson-3/php:/app
-    network_mode: "host"
+      - ./lesson-5/router:/app
     environment:
       - TZ=Europe/London
-    command: php /app/client.php
-  php_4:
+  php_3:
     build: docker/php
+    image: phpyorkshire/php
     volumes:
-      - ./lesson-4/php:/app
+      - ./lesson-3/php:/app
     network_mode: "host"
     environment:
       - TZ=Europe/London

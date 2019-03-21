@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+wait_file() {
+  local file="$1"; shift
+  local wait_seconds="${1:-10}"; shift # 10 seconds as default timeout
+
+  until test $((wait_seconds--)) -eq 0 -o -f "$file" ; do sleep 1; done
+
+  ((++wait_seconds))
+}
+
+lesson=$1
+
+if [ -z $lesson ]; then
+    echo "You must enter a lesson number as the first argument"
+    exit 1
+fi
+
+echo "Will restart crossbar for lesson $lesson"
+echo ""
+
+docker-compose restart "crossbar_$lesson"
+
+echo ""
+
+log_file="lesson-$lesson/router/logs/node.log"
+echo "Waiting for log file $log_file to be created"
+
+wait_file "$log_file" || {
+  echo "Log file missing after waiting for 10 seconds, stopping"
+  exit 1
+}
+
+echo "Will now tail -f logs for crossbar on lesson $lesson, press Ctrl+c to exit"
+echo ""
+
+tail -f "$log_file"

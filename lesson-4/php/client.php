@@ -1,4 +1,9 @@
 <?php
+/**
+ * We won't actually use this in lesson 4; it's here to crib stuff off if
+ * the work for lesson 3 breaks... I reserve the right to delete it in a future
+ * commit, but those who know git always have a way!
+ */
 
 use Psr\Log\NullLogger;
 use Thruway\Authentication\ClientWampCraAuthenticator;
