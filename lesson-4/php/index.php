@@ -36,7 +36,9 @@ $app->get('/hello/{name}', function (Request $request, Response $response, $args
 $app->get('/auth', function (Request $request, Response $response, $args){
 	$port = $request->getUri()->getPort();
 	// Port must be internal, prevents external snooping for tokens
-	if ($port!==80){
+	// Empty port will mean port 80 or 443 (i.e. defaults) so don't expose those
+	// You can do better security with keys or IP blocks
+	if ($port!==80 && !empty($port)){
 		return $response->withStatus(403)->getBody()->write("Forbidden");
 	}
 

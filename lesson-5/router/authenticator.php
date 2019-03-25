@@ -18,6 +18,33 @@ function terminal_log(string $msg){
 	echo "(Authenticator) $msg";
 }
 
+function http_get(string $url, array $headers = []){
+	$context = stream_context_create([
+		"http" => [
+			"method" => 'GET',
+			"header" => implode("\n", $headers),
+			"ignore_errors" => true,
+		],
+	]);
+
+	$response = file_get_contents($url, false, $context);
+
+	/**
+	 * @var array $http_response_header
+	 */
+	$status_line = $http_response_header[0];
+
+	preg_match('{HTTP\/\S*\s(\d{3})}', $status_line, $match);
+
+	$status = $match[1];
+
+	if ($status!=="200"){
+		throw new Exception("Unexpected response status: {$status_line}\n".$response);
+	}
+
+	return $response;
+}
+
 /**
  * @param string $name
  * @return array [string $token, string $role]
@@ -29,6 +56,15 @@ function token_from_user(string $name){
 			return ['langley', 'king'];
 		case 'edward':
 			return ['norwich', 'prince'];
+	}
+
+	$url = "http://app_4/auth?".http_build_query(['name' => $name]);
+
+	$token = http_get($url);
+	$token = trim($token);
+
+	if ($token){
+		return [$token, 'serf'];
 	}
 
 	throw new Exception("No user found with name '$name'");
@@ -71,7 +107,7 @@ $connection->on('open', function (ClientSession $session, $details){
 		try {
 			list($token, $role) = token_from_user($authid);
 		}
-		catch (Exception $e){
+		catch (Exception $e) {
 			terminal_log("Error: {$e->getMessage()}");
 
 			return [
@@ -85,7 +121,7 @@ $connection->on('open', function (ClientSession $session, $details){
 
 		return [
 			'role' => $role,
-			'secret' => $token
+			'secret' => $token,
 		];
 	})->then(function () use ($name){
 		terminal_log("I registered procedure '$name'");
@@ -113,7 +149,7 @@ $connection->on('open', function (ClientSession $session, $details){
 	});
 });
 
-$connection->on('close', function(){
+$connection->on('close', function (){
 	terminal_log("Connection closed, will keep trying to reconnect");
 });
 

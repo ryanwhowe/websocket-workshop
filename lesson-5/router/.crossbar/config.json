@@ -61,6 +61,14 @@
               }
             },
             {
+              "name": "serf",
+              "authorizer": "phpyork.permissions",
+              "disclose": {
+                "caller": true,
+                "publisher": true
+              }
+            },
+            {
               "name": "banished",
               "permissions": []
             }
