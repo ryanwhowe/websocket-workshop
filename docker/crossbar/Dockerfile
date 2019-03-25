@@ -6,13 +6,17 @@ LABEL name="phpyorkshire/crossbar"
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
+        curl \
         expat \
         build-essential \
         libssl-dev \
         libffi-dev \
+        libunwind-dev \
+        libsnappy-dev \
+        libbz2-dev \
     && pip install --no-cache-dir --upgrade pip \
     && pip install crossbar \
-    && apt-get remove -y build-essential \
+    && apt-get remove -y wget expat build-essential \
     && rm -rf ~/.cache \
     && rm -rf /var/lib/apt/lists/*
 

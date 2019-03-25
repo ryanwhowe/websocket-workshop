@@ -13,14 +13,6 @@ services:
       - ./lesson-1/router:/app
     environment:
       - TZ=Europe/London
-  http:
-    image: httpd:2.4
-    ports:
-      - "8081:80"
-    volumes:
-      - ./public:/usr/local/apache2/htdocs/
-    environment:
-      - TZ=Europe/London
   crossbar_2:
     build: docker/crossbar
     image: phpyorkshire/crossbar
@@ -55,6 +47,14 @@ services:
       - "8005:8000"
     volumes:
       - ./lesson-5/router:/app
+    environment:
+      - TZ=Europe/London
+  http:
+    image: httpd:2.4
+    ports:
+      - "8081:80"
+    volumes:
+      - ./public:/usr/local/apache2/htdocs/
     environment:
       - TZ=Europe/London
   php_3:
