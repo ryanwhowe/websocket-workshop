@@ -14,10 +14,17 @@
                 {
                   "uri": "phpyork.auth",
                   "allow": {
-                    "call": false,
-                    "register": true,
-                    "publish": false,
-                    "subscribe": false
+                    "register": true
+                  },
+                  "disclose": {
+                    "caller": true
+                  },
+                  "cache": true
+                },
+                {
+                  "uri": "phpyork.permissions",
+                  "allow": {
+                    "register": true
                   },
                   "disclose": {
                     "caller": true
@@ -30,7 +37,7 @@
               "name": "king",
               "permissions": [
                 {
-                  "uri": "phpyork.*",
+                  "uri": "phpyork.",
                   "match": "prefix",
                   "allow": {
                     "call": false,
@@ -46,7 +53,15 @@
               ]
             },
             {
-              "name": "no",
+              "name": "prince",
+              "authorizer": "phpyork.permissions",
+              "disclose": {
+                "caller": true,
+                "publisher": true
+              }
+            },
+            {
+              "name": "banished",
               "permissions": []
             }
           ]

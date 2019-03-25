@@ -24,8 +24,8 @@ var alreet = (function (){
 		args = args || ['abc', 1];
 		session.publish(name, args, {}, {exclude_me: true, acknowledge: true}).then(function (){
 			console.log('Publisher says: Yes, published to '+name+'!');
-		}, function (){
-			console.log('Publisher says: Oh no, publishing to '+name+' went wrong. I got these arguments: ', arguments);
+		}, function (error){
+			console.log('Publisher says: Oh no, publishing to '+name+' went wrong: '+error.args[0]);
 		});
 	}
 
@@ -36,8 +36,8 @@ var alreet = (function (){
 		};
 		session.subscribe(name, func).then(function (){
 			console.log('Subscriber says: Yes, subscribed to '+name+'!');
-		}, function (){
-			console.log('Subscriber says: Oh no, subscribing to '+name+' went wrong. I got these arguments: ', arguments);
+		}, function (error){
+			console.log('Subscriber says: Oh no, subscribing to '+name+' went wrong: '+error.args[0]);
 		});
 	}
 

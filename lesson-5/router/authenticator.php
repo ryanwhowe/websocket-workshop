@@ -27,6 +27,8 @@ function token_from_user(string $name){
 	switch ($name){
 		case 'edmund':
 			return ['langley', 'king'];
+		case 'edward':
+			return ['norwich', 'prince'];
 	}
 
 	throw new Exception("No user found with name '$name'");
@@ -73,7 +75,7 @@ $connection->on('open', function (ClientSession $session, $details){
 			terminal_log("Error: {$e->getMessage()}");
 
 			return [
-				'role' => 'no',
+				'role' => 'banished',
 				'secret' => '',
 				'disclose' => true,
 			];
@@ -85,6 +87,27 @@ $connection->on('open', function (ClientSession $session, $details){
 			'role' => $role,
 			'secret' => $token
 		];
+	})->then(function () use ($name){
+		terminal_log("I registered procedure '$name'");
+	});
+
+	$name = 'phpyork.permissions';
+	$session->register($name, function ($args){
+		$details = array_shift($args);
+		$uri = array_shift($args);
+		$action = array_shift($args);
+
+		terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
+
+		if ($action==='publish' && strpos($uri, "phpyork.chat")===0){
+			return ['allow' => true, 'disclose' => true, 'cache' => true];
+		}
+
+		if ($action==='subscribe' && strpos($uri, "phpyork.chat")===0){
+			return ['allow' => true, 'cache' => true];
+		}
+
+		return false;
 	})->then(function () use ($name){
 		terminal_log("I registered procedure '$name'");
 	});
