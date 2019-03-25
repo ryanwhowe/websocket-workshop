@@ -66,14 +66,14 @@ services:
     environment:
       - TZ=Europe/London
     command: php /app/client.php
-  php_4:
+  app_4:
     build: docker/php-app
     image: phpyorkshire/php-app
     ports:
       - "8082:80"
     volumes:
       - ./lesson-4/php:/app
-      - ./db:/app/db
+      - ./db:/db
     environment:
       - TZ=Europe/London
     command: php -S 0.0.0.0:80 -t /app/
