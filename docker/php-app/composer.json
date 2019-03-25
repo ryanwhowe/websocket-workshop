@@ -1,0 +1,14 @@
+{
+    "name": "m1ke/phpyorkshire-workshop-app",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "m1ke",
+            "email": "mike@m1ke.me"
+        }
+    ],
+    "require": {
+        "slim/slim": "^3.0"
+    }
+}

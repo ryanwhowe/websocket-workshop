@@ -58,7 +58,7 @@ services:
     environment:
       - TZ=Europe/London
   php_3:
-    build: docker/php
+    build: docker/php-client
     image: phpyorkshire/php
     volumes:
       - ./lesson-3/php:/app
@@ -66,5 +66,15 @@ services:
     environment:
       - TZ=Europe/London
     command: php /app/client.php
+  php_4:
+    build: docker/php-app
+    image: phpyorkshire/php-app
+    ports:
+      - "8082:80"
+    volumes:
+      - ./lesson-4/php:/app
+    environment:
+      - TZ=Europe/London
+    command: php -S 0.0.0.0:80 -t /app/
 
 

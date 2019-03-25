@@ -2,7 +2,7 @@ FROM composer AS composer
 
 COPY composer.* /app/
 
-RUN composer install --dev
+RUN composer install
 
 FROM php:7.2-cli
 
