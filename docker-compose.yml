@@ -73,6 +73,7 @@ services:
       - "8082:80"
     volumes:
       - ./lesson-4/php:/app
+      - ./db:/app/db
     environment:
       - TZ=Europe/London
     command: php -S 0.0.0.0:80 -t /app/

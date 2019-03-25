@@ -11,3 +11,6 @@ node.pid
 
 # Our custom logs dir for crossbar
 logs/
+
+# Custom JSON database
+db/*
