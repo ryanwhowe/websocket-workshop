@@ -452,6 +452,138 @@ _First some basics on how custom authenticators work_
 
 ### Lesson 4 Practical - Registering a custom authenticator
 
+Worker block
+
+```
+{
+  "type": "guest",
+  "executable": "/usr/bin/env",
+  "arguments": [
+    "php",
+    "../authenticator.php",
+    "ws://127.0.0.1:9001",
+    "yorkshire",
+    "authenticator",
+    "authenticator-kZ%3g@JR1oXb"
+  ]
+}
+```
+
+Websocket block
+
+```
+{
+  "type": "websocket",
+  "endpoint": {
+    "type": "tcp",
+    "port": 9001,
+    "interface": "127.0.0.1"
+  },
+  "auth": {
+    "wampcra": {
+      "type": "static",
+      "users": {
+        "authenticator": {
+          "secret": "authenticator-kZ%3g@JR1oXb",
+          "role": "authenticator"
+        }
+      }
+    }
+  }
+}
+```
+
+Auth role
+
+```
+"roles": [
+    {
+      "name": "authenticator",
+      "permissions": [
+        {
+          "uri": "phpyork.auth",
+          "allow": {
+            "register": true
+          },
+          "disclose": {
+            "caller": true
+          },
+          "cache": true
+        }
+      ]
+    },
+]
+```
+
+Other roles
+
+```
+{
+  "name": "king",
+  "permissions": [
+    {
+      "uri": "phpyork.",
+      "match": "prefix",
+      "allow": {
+        "call": false,
+        "register": false,
+        "publish": true,
+        "subscribe": true
+      },
+      "disclose": {
+        "publisher": true
+      },
+      "cache": true
+    }
+  ]
+},
+{
+  "name": "banished",
+  "permissions": []
+}
+```
+
+Perms role
+
+```
+{
+  "uri": "phpyork.permissions",
+  "allow": {
+    "register": true
+  },
+  "disclose": {
+    "caller": true
+  },
+  "cache": true
+}
+```
+
+Prince role
+
+```
+{
+  "name": "prince",
+  "authorizer": "phpyork.permissions",
+  "disclose": {
+    "caller": true,
+    "publisher": true
+  }
+}
+```
+
+Serf role
+
+```
+{
+  "name": "serf",
+  "authorizer": "phpyork.permissions",
+  "disclose": {
+    "caller": true,
+    "publisher": true
+  }
+},
+```
+
 ### Lesson 4 Practical - Handling granular permissions
 
 ### Lesson 4 Practical - Integration with existing auth mechanisms
