@@ -536,7 +536,7 @@ for this next step.
           "cache": true
         }
       ]
-    },
+    }
 ]
 ```
 
@@ -574,9 +574,137 @@ is deliberate and allows us to ensure an unkown user cannot get a role with perm
 even should they find a hole in the WAMPCRA authentication process.
 
 We now have everything set up to start up our crossbar server. Run `bin/run-crossbar 4`
-to restart the server and check the logs.
+to restart the server and check the logs. If we visit `http://localhost:8081/4` we can
+see that it's not possible to connect because no authenticator is yet subscribed:
 
-Perms role
+```
+alreet.setAuth('whatever', 'wont-work').connect()
+```
+
+Let's build an authenticator in PHP. Firstly we need to grab the arguments we passed to
+the worker via the command line. Add this above the WAMPCRA function that is already copied
+in from lesson 3:
+
+```
+list ($url, $realm, $user, $password) = array_slice($argv, 1);
+```
+
+We can also copy in the basic connection block:
+
+```
+$connection = new Connection([
+	"realm" => $realm,
+	"url" => $url,
+	"authmethods" => ["wampcra"],
+	"onChallenge" => $on_challenge,
+	"authid" => $user,
+]);
+```
+
+Along with the connection open and close event listeners:
+
+```
+$connection->on('open', function (ClientSession $session, $details){
+	terminal_log("Connection opened with role {$details->authrole}");
+});
+
+$connection->on('close', function (){
+    terminal_log("Connection closed, will keep trying to reconnect");
+});
+
+$connection->open();
+```
+
+Now we have the basic client similar to lesson 3. Inside the connection we can register a procedure
+that matches the name we supplied in the authentication config:
+
+```
+$name = 'phpyork.auth';
+$session->register($name, function (){
+    return [
+        'role' => 'king',
+        'secret' => 'abc',
+    ];
+})->then(function () use ($name){
+    terminal_log("I registered procedure '$name'");
+});
+```
+
+Now we can try connecting with any user name and the secret "abc". Restart with `bin/run-crossbar 4`:
+
+```
+alreet.setAuth('whatever', 'abc').connect()
+```
+
+We should now be connected to the server, but that wasn't very dynamic. We can do more with this by
+checking the arguments passed when the auth procedure is called:
+
+```
+$session->register($name, function ($args){
+    $realm = array_shift($args);
+    $authid = array_shift($args);
+    $details = array_shift($args);
+    $session_id = $details->session;
+
+    terminal_log("Received auth request for user '$authid' on realm '$realm'. Crossbar session was '$session_id'");
+    ...
+```
+
+We can restart and run here to see the data provided. The session ID will be used more later but for now is useful
+to link with the internal crossbar logs. If we add a function to the global scope nearer the top of the file
+we can then use this to supply authentication info:
+
+```
+function token_from_user(string $name){
+	switch ($name){
+		case 'edmund':
+			return ['langley', 'king'];
+	}
+
+	throw new Exception("No user found with name '$name'");
+}
+```
+
+Then also inside the authenticator (after the call to `terminal_log`) replace the static `return` with:
+
+```
+try {
+    list($token, $role) = token_from_user($authid);
+}
+catch (Exception $e) {
+    terminal_log("Error: {$e->getMessage()}");
+
+    return [
+        'role' => 'banished',
+        'secret' => '',
+        'disclose' => true,
+    ];
+}
+
+terminal_log("\tReturning token '$token'");
+
+return [
+    'role' => $role,
+    'secret' => $token,
+];
+```
+
+Once more we can restart ('bin/run-crossbar 4`) and then in the browser run:
+
+```
+alreet.setAuth('edmund', 'langley').connect()
+```
+
+We now find we're connected as Edmund of Langley, first king of the house of York.
+
+### Lesson 4 Practical - Handling granular permissions
+
+In this example our permissions were still fixed by the router configuration, which again
+is less likely to work in a real world example. We can also have our authenticator register
+a procedure to determine user permissions.
+
+This first requires a modification of the `config.json` file again, adding firstly a new
+URI permission for the "authenticator" role:
 
 ```
 {
@@ -591,7 +719,7 @@ Perms role
 }
 ```
 
-Prince role
+And then following the "king" role we can add another role:
 
 ```
 {
@@ -603,6 +731,60 @@ Prince role
   }
 }
 ```
+
+Where you can see we once again declare an RPC URI but this time as a new key `authorizer`.
+In order to handle the prince role we want to add Edmund's son, Edward of Norwich, to our users
+function (inside the `switch` statement):
+
+```
+case 'edward':
+    return ['norwich', 'prince'];
+```
+
+Now inside the on connection function of the authenticator script we can add another register
+prodecure step, this time for permissions. Rather than build it bit by bit we're going to copy
+in the whole block and can then talk about it more
+
+```
+$name = 'phpyork.permissions';
+$session->register($name, function ($args){
+    $details = array_shift($args);
+    $uri = array_shift($args);
+    $action = array_shift($args);
+
+    terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
+
+    if ($action==='publish' && strpos($uri, "phpyork.chat")===0){
+        return ['allow' => true, 'disclose' => true, 'cache' => true];
+    }
+
+    if ($action==='subscribe' && strpos($uri, "phpyork.chat")===0){
+        return ['allow' => true, 'cache' => true];
+    }
+
+    return false;
+})->then(function () use ($name){
+    terminal_log("I registered procedure '$name'");
+});
+```
+
+Now, after restarting with `bin/run-crossbar 4`, we can go to the browser and try out our new role:
+
+```
+alreet.setAuth('edward', 'norwich').connect()
+alreet.sub()
+```
+
+The role should connect but then be unable to subscribe to our default "test" topic. However if
+we follow the rules we've set for ourselves in the above permissions procedure and do:
+
+```
+alreet.sub(null, 'phpyork.chat')
+```
+
+Then it will work for us correctly.
+
+### Lesson 4 Practical - Integration with existing auth mechanisms
 
 Serf role
 
@@ -617,7 +799,16 @@ Serf role
 },
 ```
 
-### Lesson 4 Practical - Handling granular permissions
+```
+$url = "http://app_4/auth?".http_build_query(['name' => $name]);
+
+$token = http_get($url);
+$token = trim($token);
+
+if ($token){
+    return [$token, 'serf'];
+}
+```
 
 ### Lesson 4 Practical - Integration with existing auth mechanisms
 
