@@ -452,7 +452,11 @@ _First some basics on how custom authenticators work_
 
 ### Lesson 4 Practical - Registering a custom authenticator
 
-Worker block
+Adding a custom authenticator involves a few changes to the configuration file. Find it at
+`lesson-4/router/.crossbar/config.json`. The first change is to add a worker. Our "router"
+object is the only worker in the workers array at present, so add a comma at the end and then
+add this extra worker object at the end. The type of guest means this isn't a central crossbar
+service, but crossbar will act to keep the service running for us.
 
 ```
 {
@@ -469,7 +473,10 @@ Worker block
 }
 ```
 
-Websocket block
+The arguments after the script name will become clear once we look at the other required items
+and what's required in the PHP file itself. Currently the websocket router exposes a port accessible
+via web, but this worker will want to connect internally via TCP, meaning we can set up a new transport.
+At present again there is only one object in the transports array, so add this afterwards.
 
 ```
 {
@@ -493,7 +500,25 @@ Websocket block
 }
 ```
 
-Auth role
+We set up a static authentication permission and you'll see the same random "secret" is here and also
+in the worker definition we already added. Crossbar applies the same security so if we don't want
+just anybody with access to this TCP port from connecting we add a WAMPCRA authentication step
+
+The next step is for our existing web transport to be told to use dynamic authentication for those
+authenticating via WAMPCRA. So replace the whole of the existing `auth` object with the following:
+
+```
+"auth": {
+    "wampcra": {
+      "type": "dynamic",
+      "authenticator": "phpyork.auth"
+    }
+  }
+```
+
+The worker will act just like a regular client and register a procedure, specified above as "phpyork.auth"
+This means the worker itself needs a role, which we can add now. We'll go back to the "yorkshire" realm
+for this next step.
 
 ```
 "roles": [
@@ -515,7 +540,8 @@ Auth role
 ]
 ```
 
-Other roles
+We can delete the "guest" role from our yorkshire realm and instead add these (the role names
+might make sense for British history buffs later...)
 
 ```
 {
@@ -542,6 +568,13 @@ Other roles
   "permissions": []
 }
 ```
+
+You'll see the latter role has an odd feature which is that it has no permissions. This
+is deliberate and allows us to ensure an unkown user cannot get a role with permissions
+even should they find a hole in the WAMPCRA authentication process.
+
+We now have everything set up to start up our crossbar server. Run `bin/run-crossbar 4`
+to restart the server and check the logs.
 
 Perms role
 
