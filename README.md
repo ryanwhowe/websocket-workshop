@@ -796,6 +796,12 @@ The app has the following endpoints set up:
 * `curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8082/user`
    will add a new user with the specified name (names must be unique) and output both a password
    and a token. 
+   
+In the browser now we can call the method `login(user, password)` with our chosen username and the password
+from above. However that's not much use unless our authenticator can also talk to the app.
+   
+The yorkshire realm in `config.json` will need another new role so we can split the app from hardcoded
+roles if needed later.
 
 ```
 {
@@ -808,6 +814,8 @@ The app has the following endpoints set up:
 }
 ```
 
+Then before the Exception throw from the `token_from_user()` method we can make a call
+
 ```
 $url = "http://app_4/auth?".http_build_query(['name' => $name]);
 
@@ -819,7 +827,16 @@ if ($token){
 }
 ```
 
-### Lesson 4 Practical - Integration with existing auth mechanisms
+Now we're ready. Restart crossbar (`bin/run-crossbar 4`) and then in the browser call
+`login(user, password)` filling in those two paramters with the user you created and the password
+which was returned. You should see a log that it was successful If you open your browser network tab
+you can also see the token which has been returned. Now your user has a shared secret with the crossbar
+service without disclosing their password to the WAMP router or their token having to go across
+a websocket connection (and ignore the fact the local connection is HTTP - the issues of localhost!)
+
+Run `alreet.connect()` and you should see yourself signed in as a lowly serf who, because of lazy permission
+programming on my part, has all the same permissions as a prince. Obviously given the above code you'd now
+be able to change this and rightfully restore royal privilege.
 
 ## 5. Caching and listening
 
