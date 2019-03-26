@@ -9,7 +9,7 @@ var alreet = (function (){
 	const config = {
 		realm: 'yorkshire',
 		authmethods: ['wampcra'],
-		onchallenge: function(session, method, extra){
+		onchallenge: function (session, method, extra){
 			return autobahn.auth_cra.sign(token, extra.challenge);
 		},
 		max_retries: 0
@@ -32,8 +32,8 @@ var alreet = (function (){
 	function sub(func, name){
 		name = name || "test";
 		func = func || function (args){
-			console.log('Subscriber says: Got a message, it said: '+args.join(' '));
-		};
+				console.log('Subscriber says: Got a message, it said: '+args.join(' '));
+			};
 		session.subscribe(name, func).then(function (){
 			console.log('Subscriber says: Yes, subscribed to '+name+'!');
 		}, function (error){
@@ -55,11 +55,11 @@ var alreet = (function (){
 	function reg(func, name){
 		name = name || "subtract";
 		func = func || function (args){
-			console.log('Call provider says: someone called me with parameters:', args);
-			return args.reduce(function(partial_sum, a){
-				return partial_sum - 1 * a;
-			});
-		};
+				console.log('Call provider says: someone called me with parameters:', args);
+				return args.reduce(function (partial_sum, a){
+					return partial_sum-1 * a;
+				});
+			};
 		session.register(name, func).then(function (){
 			console.log('Call provider says: Yes, registered procedure '+name+'!');
 		}, function (){
@@ -87,7 +87,7 @@ var alreet = (function (){
 	function connect(callback){
 		if (connection && connection.isConnected){
 			connection.close();
-			setTimeout(function(){
+			setTimeout(function (){
 				connect(callback);
 			}, 100);
 
@@ -140,5 +140,28 @@ var alreet = (function (){
 
 	return singleton;
 })();
+
+function login(user, password){
+	var url = 'http://localhost:8082/login';
+
+	var headers = new Headers();
+	headers.append('Content-Type','application/json');
+
+	var options = {
+		method: 'POST',
+		headers: headers,
+		cors: 'no-cors',
+		body: JSON.stringify({name: user, password: password})
+	};
+
+	fetch(url, options).then(function(response) {
+		console.log('Login successful, setting token on websocket');
+		response.json().then(function(data){
+			alreet.setAuth(user, data.token);
+		});
+	}).catch(function(error){
+		console.error('Login error:', error);
+	});
+}
 
 console.log("This time we're not opening the connection automatically; run `alreet.setAuth(user, token).connect()` to try connecting");
