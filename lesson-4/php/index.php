@@ -30,7 +30,7 @@ $container['sleek'] = function ($container){
  *  Hit it from a browser or with `curl http://localhost:8082/hello/yorkshire`
  */
 $app->get('/hello/{name}', function (Request $request, Response $response, $args){
-	return $response->getBody()->write("Hello, ".$args['name']);
+	return $response->getBody()->write("Hello, ".$args['name']."\n");
 });
 
 $app->get('/auth', function (Request $request, Response $response, $args){
