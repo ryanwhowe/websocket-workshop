@@ -39,14 +39,14 @@ $container['sleek'] = function ($container){
 };
 
 /* This route is just to test the web server works
- *  Hit it from a browser or with `curl http://localhost:8082/hello/yorkshire`
+ *  Hit it from a browser or with `curl http://localhost:8014/lesson-4/yorkshire`
  */
-$app->get('/hello/{name}', function (Request $request, Response $response, $args){
+$app->get('/lesson-4/{name}', function (Request $request, Response $response, $args){
 	return $response->getBody()->write("Hello, ".$args['name']."\n");
 });
 
 /* This route lets you add a user. The easiest way is using curl:
- *   curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8082/user
+ *   curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8014/user
  * You will receive a password & token in response
  */
 $app->post('/user', function (Request $request, Response $response){
@@ -75,7 +75,7 @@ $app->post('/user', function (Request $request, Response $response){
 });
 
 /* This route will be used by the front end to "sign in" a user and return a token
- *   curl -X POST -d '{"name": "my user", "password": "****"}' -H 'content-type: application/json' localhost:8082/login
+ *   curl -X POST -d '{"name": "my user", "password": "****"}' -H 'content-type: application/json' localhost:8014/login
  * You will receive a token
  */
 $app->post('/login', function (Request $request, Response $response, $args){

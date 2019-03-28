@@ -1,8 +1,9 @@
-console.log("Welcome to lesson 4");
+console.log("Welcome to lesson 5");
 
 var alreet = (function (){
 	var session, connection;
-	const url = "ws://localhost:8004/ws";
+	// @todo change this to 8005 for the lesson
+	const url = "ws://localhost:8006/ws";
 
 	var token;
 	const config = {

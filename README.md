@@ -792,8 +792,8 @@ using the Slim framework which can be seen in `lesson-4/php/index.php`
 
 The app has the following endpoints set up:
 
-* `curl http://localhost:8082/hello/yorkshire` will print a test output to check the container works
-* `curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8082/user`
+* `curl http://localhost:8014/lesson-4/yorkshire` will print a test output to check the container works
+* `curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8014/user`
    will add a new user with the specified name (names must be unique) and output both a password
    and a token. 
    
@@ -842,6 +842,7 @@ be able to change this and rightfully restore royal privilege.
 
 In this section we will cover:
 
+* Storing 
 
 
 ## 6. Notifications with message queues

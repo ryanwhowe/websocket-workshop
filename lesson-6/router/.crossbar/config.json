@@ -1,0 +1,193 @@
+{
+  "version": 2,
+  "controller": {},
+  "workers": [
+    {
+      "type": "router",
+      "realms": [
+        {
+          "name": "yorkshire",
+          "roles": [
+            {
+              "name": "authenticator",
+              "permissions": [
+                {
+                  "uri": "phpyork.auth",
+                  "allow": {
+                    "register": true
+                  },
+                  "disclose": {
+                    "caller": true
+                  },
+                  "cache": true
+                },
+                {
+                  "uri": "phpyork.permissions",
+                  "allow": {
+                    "register": true
+                  },
+                  "disclose": {
+                    "caller": true
+                  },
+                  "cache": true
+                }
+              ]
+            },
+            {
+              "name": "king",
+              "permissions": [
+                {
+                  "uri": "phpyork.",
+                  "match": "prefix",
+                  "allow": {
+                    "call": false,
+                    "register": false,
+                    "publish": true,
+                    "subscribe": true
+                  },
+                  "disclose": {
+                    "publisher": true
+                  },
+                  "cache": true
+                }
+              ]
+            },
+            {
+              "name": "prince",
+              "authorizer": "phpyork.permissions",
+              "disclose": {
+                "caller": true,
+                "publisher": true
+              }
+            },
+            {
+              "name": "serf",
+              "authorizer": "phpyork.permissions",
+              "disclose": {
+                "caller": true,
+                "publisher": true
+              }
+            },
+            {
+              "name": "banished",
+              "permissions": []
+            }
+          ]
+        },
+        {
+          "name": "lancashire",
+          "roles": [
+            {
+              "name": "workman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": true,
+                    "register": false,
+                    "publish": false,
+                    "subscribe": true
+                  }
+                }
+              ]
+            },
+            {
+              "name": "foreman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": false,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "salesman",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": false,
+                    "register": true,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
+            },
+            {
+              "name": "customer",
+              "permissions": [
+                {
+                  "uri": "*",
+                  "allow": {
+                    "call": true,
+                    "register": false,
+                    "publish": true,
+                    "subscribe": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "transports": [
+        {
+          "type": "web",
+          "endpoint": {
+            "type": "tcp",
+            "port": 8000
+          },
+          "paths": {
+            "ws": {
+              "type": "websocket",
+              "url": "ws://localhost:8006/ws",
+              "auth": {
+                "wampcra": {
+                  "type": "dynamic",
+                  "authenticator": "phpyork.auth"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "websocket",
+          "endpoint": {
+            "type": "tcp",
+            "port": 9001,
+            "interface": "127.0.0.1"
+          },
+          "auth": {
+            "wampcra": {
+              "type": "static",
+              "users": {
+                "authenticator": {
+                  "secret": "authenticator-kZ%3g@JR1oXb",
+                  "role": "authenticator"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "guest",
+      "executable": "/usr/bin/env",
+      "arguments": [
+        "php",
+        "../authenticator.php",
+        "ws://127.0.0.1:9001",
+        "yorkshire",
+        "authenticator",
+        "authenticator-kZ%3g@JR1oXb"
+      ]
+    }
+  ]
+}
