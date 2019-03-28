@@ -53,7 +53,7 @@ $app->post('/user', function (Request $request, Response $response){
 	$name = $request->getParsedBodyParam('name');
 
 	if (empty($name)){
-		return $response->withStatus(400)->withJson(['error' => "You must submit a 'name' field to create a user"]);
+		return $response->withStatus(400)->withJson(['name' => "You must submit a 'name' field to create a user"]);
 	}
 	/**
 	 * @var SleekDB $users_db
@@ -63,7 +63,7 @@ $app->post('/user', function (Request $request, Response $response){
 	$users = $users_db->where('name', '=', $name)->fetch();
 
 	if ($users){
-		return $response->withStatus(400)->withJson(['error' => "The name '$name' is already taken"]);
+		return $response->withStatus(400)->withJson(['name' => "The name '$name' is already taken"]);
 	}
 
 	$token = make_secret();
@@ -89,15 +89,16 @@ $app->post('/login', function (Request $request, Response $response, $args){
 
 	$users = $users_db->where('name', '=', $name)->limit(1)->fetch();
 
+	$response = cors_response($response);
 	if (empty($users)){
-		return $response->withStatus(404)->write('Not found');
+		return $response->withStatus(404)->withJson(['error' => "The user with name '$name' does not exist"]);
 	}
 
 	if ($password!=$users[0]['password']){
-		return $response->withStatus(403)->getBody()->write("Wrong password");
+		return $response->withStatus(403)->withJson(['error' => "Wrong password"]);
 	}
 
-	return cors_response($response)->withJson(['token' => $users[0]['token']]);
+	return $response->withJson(['token' => $users[0]['token']]);
 });
 
 $app->options('/login', function (Request $request, Response $response, $args){

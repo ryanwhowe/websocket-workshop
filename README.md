@@ -844,7 +844,6 @@ In this section we will cover:
 
 * Storing 
 
-
 ## 6. Notifications with message queues
 
 In this section we will cover:
