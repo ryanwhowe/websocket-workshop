@@ -27,7 +27,7 @@ function token_from_user(string $name){
 
 function register_auth(ClientSession $session){
 	$name = 'phpyork.auth';
-	$session->register($name, function ($args){
+	register($session, $name, function ($args){
 		$realm = array_shift($args);
 		$authid = array_shift($args);
 		$details = array_shift($args);
@@ -54,14 +54,12 @@ function register_auth(ClientSession $session){
 			'role' => $role,
 			'secret' => $token,
 		];
-	})->then(function () use ($name){
-		terminal_log("I registered procedure '$name'");
 	});
 }
 
 function register_permissions(ClientSession $session){
 	$name = 'phpyork.permissions';
-	$session->register($name, function ($args){
+	register($session, $name, function ($args){
 		$details = array_shift($args);
 		$uri = array_shift($args);
 		$action = array_shift($args);
@@ -77,7 +75,5 @@ function register_permissions(ClientSession $session){
 		}
 
 		return false;
-	})->then(function () use ($name){
-		terminal_log("I registered procedure '$name'");
 	});
 }

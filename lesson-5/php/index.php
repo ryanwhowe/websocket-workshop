@@ -106,9 +106,9 @@ $app->get('/access', function (Request $request, Response $response, $args){
 	// Port must be internal, prevents external snooping for tokens
 	// Empty port will mean port 80 or 443 (i.e. defaults) so don't expose those
 	// You can do better security with keys or IP blocks
-//	if ($port!==80 && !empty($port)){
-//		return $response->withStatus(403)->getBody()->write("Forbidden");
-//	}
+	if ($port!==80 && !empty($port)){
+		return $response->withStatus(403)->getBody()->write("Forbidden");
+	}
 
 	$permalink = $request->getQueryParam('thread');
 	$user = $request->getQueryParam('user');

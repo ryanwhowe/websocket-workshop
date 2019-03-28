@@ -1,5 +1,6 @@
 <?php
 use Psr\Log\NullLogger;
+use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 
 function terminal_log(string $msg){
@@ -33,6 +34,18 @@ function http_get(string $url, array $headers = []){
 	}
 
 	return trim($response);
+}
+
+function register(ClientSession $session, string $name, callable $func){
+	$session->register($name, $func)->then(function () use ($name){
+		terminal_log("I registered procedure '$name'");
+	});
+}
+
+function subscribe(ClientSession $session, string $topic, callable $func){
+	$session->subscribe($topic, $func)->then(function () use ($topic){
+		terminal_log("I subscribed to topic '$topic'");
+	});
 }
 
 Logger::set(new NullLogger());

@@ -842,16 +842,113 @@ be able to change this and rightfully restore royal privilege.
 
 In this section we will cover:
 
-* Storing 
+* Storing messages sent via pub-sub
+* Allowing users to see who's online
+
+Set up a "thread" on the application:
+
+```
+curl -X POST -d '{"name": "my user", "title": "some thread"}' -H 'content-type: application/json' localhost:8015/thread
+```
+
+Permissions auth side
+
+```
+if (in_array($action, ['call', 'register'])){
+    return false;
+}
+
+$thread = str_replace('phpyork.chat.', '', $uri);
+if (!$thread){
+    terminal_log("No thread name found");
+    return false;
+}
+
+$url = "http://app_5/access?".http_build_query(['thread' => $thread, 'user' => $user]);
+
+try {
+    http_get($url);
+}
+catch (Exception $e) {
+    terminal_log("Error: {$e->getMessage()}");
+
+    return false;
+}
+
+return ['allow' => true, 'disclose' => true, 'cache' => true];
+```
+
+Test permissions on browser:
+
+```
+login(user, password)
+const thread = 'phpyork.chat.thread-permalink'
+alreet.connect().sub(thread).pub(thread, 'Hello to you');
+```
+
+Subscription monitoring
+
+```
+subscribe($session, 'wamp.subscription.on_create', function($args) use ($session){
+    $subscriber_session_id = array_shift($args);
+
+    if ($subscriber_session_id==$session->getSessionId()){
+        // Avoids us catching any subscriptions we do ourselves
+        return;
+    }
+
+    $details = array_shift($args);
+    $topic = $details->uri;
+    terminal_log("A user ($subscriber_session_id) subscribed to a topic: '{$topic}'");
+});
+```
+
+Permission to do that
+
+```
+{
+  "uri": "wamp.subscription.on_create",
+  "allow": {
+    "subscribe": true
+  },
+  "cache": true
+}
+```
+
+Listening in
+
+```
+subscribe($session, $topic, function($args, $kwargs, $details) use ($topic){
+    terminal_log("We snooped on a message from '{$details->publisher_authid}' to topic '$topic' that said: '{$args[0]}'");
+});
+```
+
+```
+{
+  "uri": "phpyork.chat.",
+  "match": "prefix",
+  "allow": {
+    "subscribe": true
+  },
+  "cache": true
+}
+```
+
+[Next: save messages to the app via HTTP, store users as they subscribe, allow a call to find these users]
 
 ## 6. Notifications with message queues
 
 In this section we will cover:
 
+* Ensuring we don't block websockets with API calls
+* Allowing other applications to communicate outside of websockets
 
 
 ## 7. Experiments with WebRTC
 
 In this section we will cover:
 
-
+* Principles of WebRTC
+* Basic connection establishment
+* How websockets can be used to facilitate WebRTC connections
+* Tools & pitfalls for WebRTC development

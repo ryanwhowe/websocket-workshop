@@ -30,6 +30,21 @@
                     "caller": true
                   },
                   "cache": true
+                },
+                {
+                  "uri": "wamp.subscription.on_create",
+                  "allow": {
+                    "subscribe": true
+                  },
+                  "cache": true
+                },
+                {
+                  "uri": "phpyork.chat.",
+                  "match": "prefix",
+                  "allow": {
+                    "subscribe": true
+                  },
+                  "cache": true
                 }
               ]
             },
