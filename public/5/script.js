@@ -164,4 +164,6 @@ function login(user, password){
 	});
 }
 
-console.log("This time we're not opening the connection automatically; run `alreet.setAuth(user, token).connect()` to try connecting");
+console.log("We will start by logging in using a user and password created from the App in lesson 4.\n" +
+	"Use the 'login(user, password)' method, or if you know the token run alreet.setAuth(user, token)\n" +
+	"Either way once done run alreet.connect()");

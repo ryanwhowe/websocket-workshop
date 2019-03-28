@@ -42,7 +42,9 @@ RUN crossbar version
 
 # We need to install and enable the zmq php extension
 RUN pecl install zmq-beta && \
-    docker-php-ext-enable zmq
+    pecl install redis && \
+    docker-php-ext-enable zmq && \
+    docker-php-ext-enable redis
 
 WORKDIR /app
 
