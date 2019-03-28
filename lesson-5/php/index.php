@@ -83,16 +83,52 @@ $app->post('/thread', function (Request $request, Response $response){
 	 */
 	$threads_db = $this->sleek->threads;
 
-	$user_id = $users[0]['_id'];
-	$threads = $threads_db->where('title', '=', $title)->where('user', '=', $user_id)->fetch();
+	$permalink = trim($title);
+	$permalink = strtolower($permalink);
+	$permalink = preg_replace('|([^a-z0-9-])|', '-', $permalink);
+	$threads = $threads_db->where('permalink', '=', $permalink)->where('user', '=', $name)->fetch();
 
 	if ($threads){
-		return $response->withStatus(400)->withJson(['title' => "The thread title must be unique per user"]);
+		return $response->withStatus(400)->withJson(['title' => "The thread permalink ($permalink) must be unique per user"]);
 	}
 
-	$thread_id = $threads_db->insert(['user' => $user_id, 'title' => $title])['_id'];
+	$threads_db->insert(['user' => $name, 'title' => $title, 'permalink' => $permalink])['_id'];
 
-	return $response->withJson(['thread_id' => $thread_id]);
+	return $response->withJson(['uri' => "phpyork.chat.$permalink"]);
+});
+
+/*
+ * This will be called by the authenticator but will not be accessible to curl due
+ * to the test check below
+ */
+$app->get('/access', function (Request $request, Response $response, $args){
+	$port = $request->getUri()->getPort();
+	// Port must be internal, prevents external snooping for tokens
+	// Empty port will mean port 80 or 443 (i.e. defaults) so don't expose those
+	// You can do better security with keys or IP blocks
+//	if ($port!==80 && !empty($port)){
+//		return $response->withStatus(403)->getBody()->write("Forbidden");
+//	}
+
+	$permalink = $request->getQueryParam('thread');
+	$user = $request->getQueryParam('user');
+
+	if (!$user || !$permalink){
+		return $response->withStatus(400)->write("You must enter a 'thread' and 'name' query string");
+	}
+
+	/**
+	 * @var SleekDB $threads_db
+	 */
+	$threads_db = $this->sleek->threads;
+
+	$threads = $threads_db->where('user', '=', $user)->where('permalink', '=', $permalink)->limit(1)->fetch();
+
+	if (!$threads){
+		return $response->withStatus(401)->write("No match for supplied user and thread");
+	}
+
+	return $response->write($threads[0]['permalink']);
 });
 
 $app->run();

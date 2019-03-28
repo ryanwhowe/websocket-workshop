@@ -17,7 +17,6 @@ function token_from_user(string $name){
 	$url = "http://app_4/auth?".http_build_query(['name' => $name]);
 
 	$token = http_get($url);
-	$token = trim($token);
 
 	if ($token){
 		return [$token, 'serf'];

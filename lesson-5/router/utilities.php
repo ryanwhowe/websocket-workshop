@@ -15,7 +15,9 @@ function http_get(string $url, array $headers = []){
 		],
 	]);
 
-	$response = file_get_contents($url, false, $context);
+	// Error submission is bad, but in your own applications you
+	// will be using Guzzle or similar, right?
+	$response = @file_get_contents($url, false, $context);
 
 	/**
 	 * @var array $http_response_header
@@ -27,10 +29,10 @@ function http_get(string $url, array $headers = []){
 	$status = $match[1];
 
 	if ($status!=="200"){
-		throw new Exception("Unexpected response status: {$status_line}\n".$response);
+		throw new Exception("Unexpected response status: {$status_line}\n\t$response");
 	}
 
-	return $response;
+	return trim($response);
 }
 
 Logger::set(new NullLogger());

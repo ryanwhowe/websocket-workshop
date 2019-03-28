@@ -17,7 +17,6 @@ function token_from_user(string $name){
 	$url = "http://app_4/auth?".http_build_query(['name' => $name]);
 
 	$token = http_get($url);
-	$token = trim($token);
 
 	if ($token){
 		return [$token, 'serf'];
@@ -67,17 +66,31 @@ function register_permissions(ClientSession $session){
 		$uri = array_shift($args);
 		$action = array_shift($args);
 
-		terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
+		$user = $details->authid;
+		terminal_log("User {$user} ({$details->session}) wants to $action on endpoint: $uri");
 
-		if ($action==='publish' && strpos($uri, "phpyork.chat")===0){
-			return ['allow' => true, 'disclose' => true, 'cache' => true];
+		if (in_array($action, ['call', 'register'])){
+			return false;
 		}
 
-		if ($action==='subscribe' && strpos($uri, "phpyork.chat")===0){
-			return ['allow' => true, 'cache' => true];
+		$thread = str_replace('phpyork.chat.', '', $uri);
+		if (!$thread){
+			terminal_log("No thread name found");
+			return false;
 		}
 
-		return false;
+		$url = "http://app_5/access?".http_build_query(['thread' => $thread, 'user' => $user]);
+
+		try {
+			http_get($url);
+		}
+		catch (Exception $e) {
+			terminal_log("Error: {$e->getMessage()}");
+
+			return false;
+		}
+
+		return ['allow' => true, 'disclose' => true, 'cache' => true];
 	})->then(function () use ($name){
 		terminal_log("I registered procedure '$name'");
 	});

@@ -131,7 +131,7 @@ $app->get('/auth', function (Request $request, Response $response, $args){
 		return $response->withStatus(404)->write('Not found');
 	}
 
-	return $response->getBody()->write($users[0]['token']);
+	return $response->write($users[0]['token']);
 });
 
 $app->run();

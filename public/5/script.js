@@ -19,25 +19,42 @@ var alreet = (function (){
 		session = openedSession;
 	}
 
-	function pub(args, name){
-		name = name || "test";
-		args = args || ['abc', 1];
-		session.publish(name, args, {}, {exclude_me: true, acknowledge: true}).then(function (){
-			console.log('Publisher says: Yes, published to '+name+'!');
+	function checkThread(thread){
+		if (!thread){
+			throw "You must enter a thread name as first parameter";
+		}
+		const prefix = "phpyork.chat.";
+		if (thread.indexOf(prefix)!==0){
+			thread = prefix+thread;
+		}
+		return thread;
+	}
+
+	function pub(thread, message){
+
+		thread = checkThread(thread);
+
+		if (!message){
+			throw "You must enter a message as second parameter";
+		}
+
+		session.publish(thread, [message], {}, {acknowledge: true}).then(function (){
+			console.log('Publisher says: Yes, published to '+thread+'!');
 		}, function (error){
-			console.log('Publisher says: Oh no, publishing to '+name+' went wrong: '+error.args[0]);
+			console.log('Publisher says: Oh no, publishing to '+thread+' went wrong: '+error.args[0]);
 		});
 	}
 
-	function sub(func, name){
-		name = name || "test";
-		func = func || function (args){
+	function sub(thread){
+		thread = checkThread(thread);
+
+		var func = function (args){
 				console.log('Subscriber says: Got a message, it said: '+args.join(' '));
 			};
-		session.subscribe(name, func).then(function (){
-			console.log('Subscriber says: Yes, subscribed to '+name+'!');
+		session.subscribe(thread, func).then(function (){
+			console.log('Subscriber says: Yes, subscribed to '+thread+'!');
 		}, function (error){
-			console.log('Subscriber says: Oh no, subscribing to '+name+' went wrong: '+error.args[0]);
+			console.log('Subscriber says: Oh no, subscribing to '+thread+' went wrong: '+error.args[0]);
 		});
 	}
 
