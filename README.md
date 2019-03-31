@@ -840,13 +840,27 @@ In this section we will cover:
 * Storing messages sent via pub-sub
 * Allowing users to see who's online
 
+With the application connected to an authentication system we can now imagine a deeper integration,
+where actions taken on the websocket system need reflecting in the application.
+
+### Lesson 5 Practical - Permissions via API calls
+
+A second PHP app has been set up connecting to the same databases. All previous calls can still be
+made to the endpoint on port 8014, the new calls here are made to 8015.
+
 Set up a "thread" on the application:
 
 ```
 curl -X POST -d '{"name": "my user", "title": "some thread"}' -H 'content-type: application/json' localhost:8015/thread
 ```
 
-Permissions auth side
+The thread permission model in the application is simple - a thread records indicates that a named user
+has access to a named thread. Check `db/threads/data` to see the JSON files created after running this request.
+
+Because we are going to start storing messages we should also ensure a user has access to publish or 
+subscribe to a thread. This can be done with an HTTP call to our application similar to authentication.
+
+In the `register_permissions` method replace the current logic (after the log line) with this:
 
 ```
 if (in_array($action, ['call', 'register'])){
@@ -873,7 +887,8 @@ catch (Exception $e) {
 return ['allow' => true, 'disclose' => true, 'cache' => true];
 ```
 
-Test permissions on browser:
+Once in place, crossbar restarted, and with appropriate threads created, the login and connect process
+can be carried out in the browser as follows:
 
 ```
 login(user, password)
@@ -881,7 +896,13 @@ const thread = 'phpyork.chat.thread-permalink'
 alreet.connect().sub(thread).pub(thread, 'Hello to you');
 ```
 
-Subscription monitoring
+### Lesson 5 Practical - Recording messages to our app
+
+Crossbar provides "Meta events" in the form of topics to subscribe to and procedures to call.
+
+Using one of these we can act as a "listener" on user chats and record these to our app.
+
+Add the following inside the `start_connection` callback:
 
 ```
 subscribe($session, 'wamp.subscription.on_create', function($args) use ($session){
@@ -899,7 +920,8 @@ subscribe($session, 'wamp.subscription.on_create', function($args) use ($session
 });
 ```
 
-Permission to do that
+The authenticator also needs a permission added to `config.json` to do this - to save updating these
+for subsequent actions we can use a prefix match:
 
 ```
 {
@@ -913,13 +935,17 @@ Permission to do that
 },
 ```
 
-Listening in
+Test this in a browser and when a correct subscription (based on permissions) is made the log line should appear.
+
+Once this works we can add the following after the log line in order to listen to individual chat messages:
 
 ```
 subscribe($session, $topic, function($args, $kwargs, $details) use ($topic){
     terminal_log("We snooped on a message from '{$details->publisher_authid}' to topic '$topic' that said: '{$args[0]}'");
 });
 ```
+
+And again we need permission to do this:
 
 ```
 {
@@ -932,7 +958,10 @@ subscribe($session, $topic, function($args, $kwargs, $details) use ($topic){
 }
 ```
 
-Save messages via HTTP
+Now when users subscribe to a topic (for the first time in a run of the router) a log line will appear
+_and_ when any message is published another log line will appear. To round this off we can make an API
+call to our application with the user's message, saving it to a database. Add this after the log line
+in our "listening" subscription:
 
 ```
 $thread = str_replace('phpyork.chat.', '', $topic);
@@ -952,6 +981,13 @@ catch (Exception $e){
 
 terminal_log("Saved message via HTTP");
 ```
+
+Now when users publish a message we should see our API get called, and can see saved messages in `db/messages/data`
+as individual JSON files, recorded with the correct user name and thread name. In the app code for this
+the same permissions have been used, though given the restrictions on who can publish via websockets and the
+app port block this actually should not be necessary.
+
+### Lesso 
 
 On subscription first attempt
 ```
@@ -1060,7 +1096,6 @@ subscribe($session, 'wamp.subscription.on_unsubscribe', function ($args) use ($s
     $topic_id = $args[1];
 
     terminal_log("A user unsubscribed from topic $topic_id");
-
 });
 ```
 
