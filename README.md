@@ -703,23 +703,18 @@ In this example our permissions were still fixed by the router configuration, wh
 is less likely to work in a real world example. We can also have our authenticator register
 a procedure to determine user permissions.
 
-This first requires a modification of the `config.json` file again, adding firstly a new
-URI permission for the "authenticator" role:
+This first requires a modification of the `config.json` file again. Rather than adding a new
+permission to our authenticator role we can just widen the scope a little. Change:
+
+`"uri": "phpyork.auth"` to `"uri": "phpyork."` and then on the line below add a new field:
 
 ```
-{
-  "uri": "phpyork.permissions",
-  "allow": {
-    "register": true
-  },
-  "disclose": {
-    "caller": true
-  },
-  "cache": true
-}
+"match": "prefix",
 ```
 
-And then following the "king" role we can add another role:
+This allows the authenticator to register any procedure in the namespace, which will be useful later
+
+Then following the "king" role we can add another role:
 
 ```
 {
@@ -899,7 +894,8 @@ subscribe($session, 'wamp.subscription.on_create', function($args) use ($session
 
     $details = array_shift($args);
     $topic = $details->uri;
-    terminal_log("A user ($subscriber_session_id) subscribed to a topic: '{$topic}'");
+    $topic_id = $details->id;
+    terminal_log("A user ($subscriber_session_id) subscribed to a topic: '{$topic}' ({$topic_id})");
 });
 ```
 
@@ -910,10 +906,11 @@ Permission to do that
   "uri": "wamp.subscription.",
   "match": "prefix",
   "allow": {
-    "subscribe": true
+    "subscribe": true,
+    "call": true
   },
   "cache": true
-}
+},
 ```
 
 Listening in
@@ -956,7 +953,145 @@ catch (Exception $e){
 terminal_log("Saved message via HTTP");
 ```
 
-[Next: store users as they subscribe, allow a call to find these users]
+On subscription first attempt
+```
+subscribe($session, 'wamp.subscription.on_subscribe', function ($args) use ($session){
+    $subscriber_session_id = array_shift($args);
+    if ($subscriber_session_id==$session->getSessionId()){
+        // Avoids us catching any subscriptions we do ourselves
+        return;
+    }
+
+    $topic_id = array_shift($args);
+
+    terminal_log("A user ($subscriber_session_id) subscribed to a topic: ($topic_id)");
+});
+```
+
+Now that we just have IDs we need to start storing this data ourselves.
+
+Adding Redis
+
+Add this to `register_auth()` just before the final `return` statement:
+
+```
+redis_set("session-$session_id", $authid);
+```
+
+Add this into our "on_create" listener (after the log line)
+
+```
+redis_set("topic-$topic_id", $topic);
+redis_set_array($topic, []);
+```
+
+Replace the log line in our "on_subscribe" listener with
+```
+$topic = redis_get("topic-$topic_id");
+
+$user = redis_get("session-$subscriber_session_id");
+
+terminal_log("A user $user ($subscriber_session_id) subscribed to a topic: '{$topic}' ($topic_id)");
+
+redis_add_to_array($topic ?? '', $user);
+```
+
+Now that we have a list of subscribers we can let users call this. We'll keep it simple at
+this stage and let any user call it, rather than restricting to thread access. The authenticator
+will need to register this procedure:
+
+```
+register($session, 'phpyork.subscribers', function($args){
+    $topic = $args[0];
+    if (!$topic){
+        terminal_log("No topic supplied to check users");
+        return '[]';
+    }
+
+    if (strpos($topic, "phpyork.chat.")!==0){
+        $topic = "phpyork.chat.$topic";
+    }
+
+    $users = redis_get($topic);
+
+    terminal_log("Returning list of users for URI '$topic': $users");
+
+    return $users;
+});
+```
+
+To allow our browser clients to call it we can modify the `register_permissions()`
+function by swapping the block:
+
+```
+if (in_array($action, ['call', 'register'])){
+    return false;
+}
+```
+
+With this:
+
+```
+if ($action==='register'){
+    return false;
+}
+
+if ($action==='call'){
+    return $uri==='phpyork.subscribers';
+}
+```
+
+We can now call this in a browser. Try connecting, subscribing to a topic (make sure it's
+successful) and then run this in the browser console:
+
+```
+alreet.call('your-thread-name')
+```
+
+If it works the output should be a JSON encoded list of user names. To debug the Redis store
+you can check out the Redis web UI at `http://localhost:5001/redis:6379/0/keys/`
+
+Finally we need to handle user presence if they sign off. This requires two more WAMP meta
+integrations. The following subscription gives the topic ID of a topic which has been
+unsubscribed.
+
+```
+subscribe($session, 'wamp.subscription.on_unsubscribe', function ($args) use ($session){
+    $topic_id = $args[1];
+
+    terminal_log("A user unsubscribed from topic $topic_id");
+
+});
+```
+
+For some reason this doesn't indicate which user unsubscribed. We can find this out using
+a call to an endpoint which lists topic subscriber IDs:
+
+```
+call($session, 'wamp.subscription.list_subscribers', [$topic_id], function (CallResult $result) use ($session, $topic_id){
+    $sessions = $result->getResultMessage()->getArguments();
+
+    $session_ids = array_shift($sessions);
+    $topic_users = [];
+    foreach ($session_ids as $session_id){
+        $user = redis_get("session-$session_id");
+        if ($user){
+            $topic_users[] = $user;
+        }
+    }
+
+    $topic = redis_get("topic-$topic_id");
+
+    terminal_log("Updating subscribers for $topic to: ".implode(', ', $topic_users));
+
+    redis_set_array($topic, $topic_users);
+});
+```
+
+This now has the effect of storing the subscriber list every time a user disconnects. You may notice
+that if the topic ID key search was reversed then this procedure could be used instead of caching
+the list in Redis, but caching more effectively demonstrates how the data might be used as well as reducing
+load on the WAMP cache in favour of a more scalable caching service like Redis.
 
 ## 6. Notifications with message queues
 

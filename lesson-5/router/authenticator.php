@@ -4,6 +4,7 @@
  * Have moved a few items into functions to keep stuff clean
  */
 
+use Thruway\CallResult;
 use Thruway\ClientSession;
 
 require __DIR__.'/../vendor/autoload.php';

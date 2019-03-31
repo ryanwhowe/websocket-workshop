@@ -12,17 +12,8 @@
               "name": "authenticator",
               "permissions": [
                 {
-                  "uri": "phpyork.auth",
-                  "allow": {
-                    "register": true
-                  },
-                  "disclose": {
-                    "caller": true
-                  },
-                  "cache": true
-                },
-                {
-                  "uri": "phpyork.permissions",
+                  "uri": "phpyork.",
+                  "match": "prefix",
                   "allow": {
                     "register": true
                   },
