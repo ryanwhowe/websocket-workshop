@@ -987,9 +987,15 @@ as individual JSON files, recorded with the correct user name and thread name. I
 the same permissions have been used, though given the restrictions on who can publish via websockets and the
 app port block this actually should not be necessary.
 
-### Lesso 
+### Lesson 5 practical - Listing active users
 
-On subscription first attempt
+When users are using a real time application to talk, collaborate or game with other users a key feature
+is knowing who is online. Using publish times or sending keep alive publish messages might be one way
+to handle this, but our router can actually provide tools to carry this out in a more robust fashion.
+
+As well as publishing a message the first time any user subscribes to a topic, we can listen for every
+time any user subscribes to a topic:
+
 ```
 subscribe($session, 'wamp.subscription.on_subscribe', function ($args) use ($session){
     $subscriber_session_id = array_shift($args);
@@ -1004,9 +1010,13 @@ subscribe($session, 'wamp.subscription.on_subscribe', function ($args) use ($ses
 });
 ```
 
-Now that we just have IDs we need to start storing this data ourselves.
+We run into a problem here though: the subscription listener only gives us IDs for the session and topic.
+We have seen these IDs before and sometimes output them in log messages, but now we need to store
+what they relate to in order to be useful.
 
-Adding Redis
+This is where the Redis key-value database can be used as a fast effective cache for these lookups. In
+order to use Redis effectively we need to add some storage of values to a number of existing places
+in the application.
 
 Add this to `register_auth()` just before the final `return` statement:
 
@@ -1021,7 +1031,8 @@ redis_set("topic-$topic_id", $topic);
 redis_set_array($topic, []);
 ```
 
-Replace the log line in our "on_subscribe" listener with
+Then finally replace the log line in our "on_subscribe" listener with:
+
 ```
 $topic = redis_get("topic-$topic_id");
 
@@ -1031,6 +1042,11 @@ terminal_log("A user $user ($subscriber_session_id) subscribed to a topic: '{$to
 
 redis_add_to_array($topic ?? '', $user);
 ```
+
+_NB: The simple snake case Redis methods are in `storage.php` as easy ways to use Redis without 
+delving too far into its operation. A better way to handle this would be a single class which could
+more effectively handle connections, but be careful about assuming a single object created once
+will work everywhere in an application which may live days or weeks rather than half a second._
 
 Now that we have a list of subscribers we can let users call this. We'll keep it simple at
 this stage and let any user call it, rather than restricting to thread access. The authenticator
