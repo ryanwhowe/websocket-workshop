@@ -1,4 +1,6 @@
 <?php
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Log\NullLogger;
 use Thruway\ClientSession;
 use Thruway\Logging\Logger;
@@ -7,33 +9,36 @@ function terminal_log(string $msg){
 	echo "(Authenticator) $msg";
 }
 
-function http_get(string $url, array $headers = []){
-	$context = stream_context_create([
-		"http" => [
-			"method" => 'GET',
-			"header" => implode("\n", $headers),
-			"ignore_errors" => true,
-		],
-	]);
+function http_get(string $url){
+	$client = new Client();
 
-	// Error submission is bad, but in your own applications you
-	// will be using Guzzle or similar, right?
-	$response = @file_get_contents($url, false, $context);
-
-	/**
-	 * @var array $http_response_header
-	 */
-	$status_line = $http_response_header[0];
-
-	preg_match('{HTTP\/\S*\s(\d{3})}', $status_line, $match);
-
-	$status = $match[1];
-
-	if ($status!=="200"){
-		throw new Exception("Unexpected response status: {$status_line}\n\t$response");
+	try {
+		$response = $client->get($url);
+	}
+	catch (RequestException $e) {
+		$response = $e->getResponse();
+		throw new Exception("Unexpected response status: {$response->getStatusCode()}\n\t{$response->getBody()}");
 	}
 
-	return trim($response);
+	$text = (string) $response->getBody();
+
+	return trim($text);
+}
+
+function http_post(string $url, array $data){
+	$client = new Client();
+
+	try {
+		$response = $client->post($url, ['form_params' => $data]);
+	}
+	catch (RequestException $e){
+		$response = $e->getResponse();
+		throw new Exception("Unexpected response status: {$response->getStatusCode()}\n\t{$response->getBody()}");
+	}
+
+	$text = (string) $response->getBody();
+
+	return trim($text);
 }
 
 function register(ClientSession $session, string $name, callable $func){

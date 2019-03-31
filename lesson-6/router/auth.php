@@ -77,7 +77,7 @@ function register_permissions(ClientSession $session){
 			return false;
 		}
 
-		$url = "http://app_5/access?".http_build_query(['thread' => $thread, 'user' => $user]);
+		$url = "http://app_5/access?".http_build_query(['thread' => $thread, 'name' => $user]);
 
 		try {
 			http_get($url);

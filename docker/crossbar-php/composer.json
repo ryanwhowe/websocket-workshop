@@ -10,6 +10,7 @@
     ],
     "require": {
         "voryx/thruway": "^0.5.3",
-        "thruway/pawl-transport": "^0.5.0"
+        "thruway/pawl-transport": "^0.5.0",
+        "guzzlehttp/guzzle": "^6.3.3"
     }
 }

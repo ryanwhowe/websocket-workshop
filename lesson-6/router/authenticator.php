@@ -31,7 +31,25 @@ start_connection($argv, function (ClientSession $session, $details){
 		terminal_log("A user ($subscriber_session_id) subscribed to a topic: '{$topic}'");
 
 		subscribe($session, $topic, function($args, $kwargs, $details) use ($topic){
-			terminal_log("We snooped on a message from '{$details->publisher_authid}' to topic '$topic' that said: '{$args[0]}'");
+			$message = $args[0];
+			$user = $details->publisher_authid;
+			terminal_log("We snooped on a message from '{$user}' to topic '$topic' that said: '{$message}'");
+			$thread = str_replace('phpyork.chat.', '', $topic);
+
+			$url = "http://app_5/message";
+			try {
+				http_post($url, [
+					'user' => $user,
+					'thread' => $thread,
+					'message' => $message,
+				]);
+			}
+			catch (Exception $e){
+				terminal_log("Error: {$e->getMessage()}");
+				return;
+			}
+
+			terminal_log("Saved message via HTTP");
 		});
 	});
 });

@@ -33,7 +33,7 @@ $app = new App($config);
 
 $container = $app->getContainer();
 $container['sleek'] = function ($container){
-	$tables = ['users', 'threads'];
+	$tables = ['users', 'threads', 'messages'];
 	$db = [];
 	foreach ($tables as $table){
 		$db[$table] = SleekDB::store($table, __DIR__.'/../db');
@@ -92,7 +92,7 @@ $app->post('/thread', function (Request $request, Response $response){
 		return $response->withStatus(400)->withJson(['title' => "The thread permalink ($permalink) must be unique per user"]);
 	}
 
-	$threads_db->insert(['user' => $name, 'title' => $title, 'permalink' => $permalink])['_id'];
+	$threads_db->insert(['user' => $name, 'title' => $title, 'permalink' => $permalink]);
 
 	return $response->withJson(['uri' => "phpyork.chat.$permalink"]);
 });
@@ -103,17 +103,17 @@ $app->post('/thread', function (Request $request, Response $response){
  */
 $app->get('/access', function (Request $request, Response $response, $args){
 	$port = $request->getUri()->getPort();
-	// Port must be internal, prevents external snooping for tokens
+	// Port must be internal, prevents external snooping for access
 	// Empty port will mean port 80 or 443 (i.e. defaults) so don't expose those
 	// You can do better security with keys or IP blocks
 	if ($port!==80 && !empty($port)){
 		return $response->withStatus(403)->getBody()->write("Forbidden");
 	}
 
-	$permalink = $request->getQueryParam('thread');
-	$user = $request->getQueryParam('user');
+	$thread = $request->getQueryParam('thread');
+	$user = $request->getQueryParam('name');
 
-	if (!$user || !$permalink){
+	if (!$user || !$thread){
 		return $response->withStatus(400)->write("You must enter a 'thread' and 'name' query string");
 	}
 
@@ -122,13 +122,53 @@ $app->get('/access', function (Request $request, Response $response, $args){
 	 */
 	$threads_db = $this->sleek->threads;
 
-	$threads = $threads_db->where('user', '=', $user)->where('permalink', '=', $permalink)->limit(1)->fetch();
+	$threads = $threads_db->where('user', '=', $user)->where('permalink', '=', $thread)->limit(1)->fetch();
 
 	if (!$threads){
 		return $response->withStatus(401)->write("No match for supplied user and thread");
 	}
 
 	return $response->write($threads[0]['permalink']);
+});
+
+
+$app->post('/message', function (Request $request, Response $response){
+
+	$port = $request->getUri()->getPort();
+	// Port must be internal, prevents external posting with user details
+	// Empty port will mean port 80 or 443 (i.e. defaults) so don't expose those
+	// You can do better security with keys or IP blocks
+	if ($port!==80 && !empty($port)){
+		return $response->withStatus(403)->getBody()->write("Forbidden");
+	}
+
+	$thread = $request->getParsedBodyParam('thread');
+	$user = $request->getParsedBodyParam('user');
+	$message = $request->getParsedBodyParam('message');
+
+	if (!$user || !$thread || !$message){
+		return $response->withStatus(400)->write("You must enter a 'thread', 'user' and 'message' field in the request body");
+	}
+
+	/**
+	 * @var SleekDB $threads_db
+	 */
+	$threads_db = $this->sleek->threads;
+
+	$threads = $threads_db->where('user', '=', $user)->where('permalink', '=', $thread)->limit(1)->fetch();
+
+	if (!$threads){
+		return $response->withStatus(401)->write("The user '$user' does not have access to post messages to thread '$thread'");
+	}
+
+	/**
+	 * @var SleekDB $messages_db
+	 */
+	$messages_db = $this->sleek->messages;
+
+	$messages_db->insert(['user' => $user, 'thread' => $thread, 'message' => $message, 'date' => date('Y-m-d H:i:s')]);
+
+	return $response->withStatus(204);
 });
 
 $app->run();

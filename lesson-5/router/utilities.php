@@ -16,7 +16,7 @@ function http_get(string $url, array $headers = []){
 		],
 	]);
 
-	// Error submission is bad, but in your own applications you
+	// Error suppression is bad, but in your own applications you
 	// will be using Guzzle or similar, right?
 	$response = @file_get_contents($url, false, $context);
 
