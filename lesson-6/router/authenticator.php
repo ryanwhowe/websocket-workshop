@@ -37,6 +37,7 @@ start_connection($argv, function (ClientSession $session, $details){
 		terminal_log("A user $user ($subscriber_session_id) caused a topic to be created: '{$topic}' ({$topic_id})");
 
 		redis_set("topic-$topic_id", $topic);
+		redis_set_array($topic, []);
 
 		subscribe($session, $topic, function ($args, $kwargs, $details) use ($topic){
 			$message = $args[0];
@@ -102,5 +103,23 @@ start_connection($argv, function (ClientSession $session, $details){
 
 			redis_set_array($topic, $topic_users);
 		});
+	});
+
+	register($session, 'phpyork.subscribers', function($args){
+		$topic = $args[0];
+		if (!$topic){
+			terminal_log("No topic supplied to check users");
+			return '[]';
+		}
+
+		if (strpos($topic, "phpyork.chat.")!==0){
+			$topic = "phpyork.chat.$topic";
+		}
+
+		$users = redis_get($topic);
+
+		terminal_log("Returning list of users for URI '$topic': $users");
+
+		return $users;
 	});
 });

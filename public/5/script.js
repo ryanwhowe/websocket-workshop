@@ -58,11 +58,12 @@ var alreet = (function (){
 		});
 	}
 
-	function call(args, name){
-		name = name || "add";
-		args = args || [1, 2];
-		console.log(name, args);
-		session.call(name, args).then(function (res){
+	function call(thread){
+		if (!thread){
+			throw "You must enter a thread name to check users for";
+		}
+
+		session.call('phpyork.subscribers', [thread]).then(function (res){
 			console.log('Procedure caller says: I got an answer to '+name+' which was: ', res);
 		}, function (){
 			console.log('Procedure caller says: Oh no, calling '+name+' went wrong. I got these arguments: ', arguments);

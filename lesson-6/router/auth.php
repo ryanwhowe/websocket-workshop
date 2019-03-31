@@ -73,13 +73,18 @@ function register_permissions(ClientSession $session){
 		$user = $details->authid;
 		terminal_log("User {$user} ({$details->session}) wants to $action on endpoint: $uri");
 
-		if (in_array($action, ['call', 'register'])){
+		if ($action==='register'){
 			return false;
+		}
+
+		if ($action==='call'){
+			return $uri==='phpyork.subscribers';
 		}
 
 		$thread = str_replace('phpyork.chat.', '', $uri);
 		if (!$thread){
 			terminal_log("No thread name found");
+
 			return false;
 		}
 
