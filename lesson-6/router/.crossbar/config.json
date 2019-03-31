@@ -32,9 +32,11 @@
                   "cache": true
                 },
                 {
-                  "uri": "wamp.subscription.on_create",
+                  "uri": "wamp.subscription.",
+                  "match": "prefix",
                   "allow": {
-                    "subscribe": true
+                    "subscribe": true,
+                    "call": true
                   },
                   "cache": true
                 },

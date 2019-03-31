@@ -36,6 +36,10 @@ function register_auth(ClientSession $session){
 		terminal_log("Received auth request for user '$authid' on realm '$realm'. Crossbar session was '$session_id'");
 
 		try {
+			if (!$authid){
+				throw new Exception('No auth ID was supplied in the connection attempt');
+			}
+
 			list($token, $role) = token_from_user($authid);
 		}
 		catch (Exception $e) {
@@ -49,6 +53,8 @@ function register_auth(ClientSession $session){
 		}
 
 		terminal_log("\tReturning token '$token'");
+
+		redis_set("session-$session_id", $authid);
 
 		return [
 			'role' => $role,

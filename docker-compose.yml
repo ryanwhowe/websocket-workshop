@@ -4,6 +4,10 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+  redis_ui:
+    image: marian/rebrow
+    ports:
+      - "5001:5001"
   crossbar_1:
     build: docker/crossbar
     image: phpyorkshire/crossbar

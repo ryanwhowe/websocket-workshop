@@ -53,4 +53,8 @@ function subscribe(ClientSession $session, string $topic, callable $func){
 	});
 }
 
+function call(ClientSession $session, string $proc, array $args, callable $func){
+	$session->call($proc, $args)->then($func);
+}
+
 Logger::set(new NullLogger());

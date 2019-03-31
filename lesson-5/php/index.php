@@ -49,7 +49,7 @@ $app->get('/lesson-5/{name}', function (Request $request, Response $response, $a
 	return $response->getBody()->write("Hello, ".$args['name']."\n");
 });
 
-/* This route lets you add a user. The easiest way is using curl:
+/* This route lets you add a thread for a user. The easiest way is using curl:
  *   curl -X POST -d '{"name": "my user", "title": ""}' -H 'content-type: application/json' localhost:8015/thread
  * You will receive a password & token in response
  */

@@ -907,7 +907,8 @@ Permission to do that
 
 ```
 {
-  "uri": "wamp.subscription.on_create",
+  "uri": "wamp.subscription.",
+  "match": "prefix",
   "allow": {
     "subscribe": true
   },
@@ -934,7 +935,28 @@ subscribe($session, $topic, function($args, $kwargs, $details) use ($topic){
 }
 ```
 
-[Next: save messages to the app via HTTP, store users as they subscribe, allow a call to find these users]
+Save messages via HTTP
+
+```
+$thread = str_replace('phpyork.chat.', '', $topic);
+
+$url = "http://app_5/message";
+try {
+    http_post($url, [
+        'user' => $details->publisher_authid,
+        'thread' => $thread,
+        'message' => $args[0],
+    ]);
+}
+catch (Exception $e){
+    terminal_log("Error: {$e->getMessage()}");
+    return;
+}
+
+terminal_log("Saved message via HTTP");
+```
+
+[Next: store users as they subscribe, allow a call to find these users]
 
 ## 6. Notifications with message queues
 
