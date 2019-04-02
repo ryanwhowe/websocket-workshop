@@ -62,6 +62,15 @@ services:
       - ./lesson-6/router:/app
     environment:
       - TZ=Europe/London
+  crossbar_6a:
+    build: docker/crossbar-php
+    image: phpyorkshire/crossbar-php
+    ports:
+      - "8007:8000"
+    volumes:
+      - ./lesson-6a/router:/app
+    environment:
+      - TZ=Europe/London
   http:
     image: httpd:2.4
     ports:
@@ -97,6 +106,17 @@ services:
       - "8015:80"
     volumes:
       - ./lesson-5/php:/app
+      - ./db:/db
+    environment:
+      - TZ=Europe/London
+    command: php -S 0.0.0.0:80 -t /app/
+  app_6:
+    build: docker/php-app
+    image: phpyorkshire/php-app
+    ports:
+      - "8016:80"
+    volumes:
+      - ./lesson-6/php:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
