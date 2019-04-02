@@ -1,0 +1,16 @@
+{
+    "name": "m1ke/phpyorkshire-workshop-zmq",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "m1ke",
+            "email": "mike@m1ke.me"
+        }
+    ],
+    "require": {
+        "rakibtg/sleekdb": "^1.0",
+        "monolog/monolog": "^1.24",
+        "react/zmq": "^0.4.0"
+    }
+}

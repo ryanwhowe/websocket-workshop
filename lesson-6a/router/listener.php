@@ -33,16 +33,20 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 		terminal_log("We snooped on a message from '{$user}' to topic '$topic' that said: '{$message}'");
 
 		$thread = str_replace('phpyork.chat.', '', $topic);
-		$url = "http://app_5/message";
+		$send_data = [
+			'user' => $details->publisher_authid,
+			'thread' => $thread,
+			'message' => $args[0],
+		];
+		$dsn = 'tcp://zmq_6:5550';
 		try {
-			http_post($url, [
-				'user' => $details->publisher_authid,
-				'thread' => $thread,
-				'message' => $args[0],
-			]);
+			$context = new ZMQContext();
+			$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+			$socket->connect($dsn);
+			$socket->send(json_encode($send_data), ZMQ::MODE_DONTWAIT);
 		}
 		catch (Exception $e) {
-			terminal_log("Error: {$e->getMessage()}");
+			terminal_log("Error saving message: {$e->getMessage()}");
 
 			return;
 		}

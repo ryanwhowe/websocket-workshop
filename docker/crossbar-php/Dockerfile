@@ -15,10 +15,6 @@ LABEL name="phpyorkshire/crossbar-php"
 # We need python as well so lets merge the python 3-slim image
 COPY --from=python:3-slim / /
 
-# As of 21st March this stopped working due to vmprof wheel compilation
-# failing. Suggested installing python3-dev & libunwind-dev but that also
-# didn't seem to work. Will either need to get built by the course
-# or can push all up to a public repo somewhere
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \

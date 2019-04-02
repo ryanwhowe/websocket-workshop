@@ -110,16 +110,14 @@ services:
     environment:
       - TZ=Europe/London
     command: php -S 0.0.0.0:80 -t /app/
-  app_6:
-    build: docker/php-app
-    image: phpyorkshire/php-app
-    ports:
-      - "8016:80"
+  zmq_6:
+    build: docker/php-zmq
+    image: phpyorkshire/php-zmq
     volumes:
-      - ./lesson-6/php:/app
+      - ./lesson-6a/php:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
-    command: php -S 0.0.0.0:80 -t /app/
+    command: php /app/zmq.php
 
 
