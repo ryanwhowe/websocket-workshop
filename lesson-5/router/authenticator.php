@@ -13,8 +13,8 @@ require 'utilities.php';
 require 'connection.php';
 require 'auth.php';
 
-start_connection($argv, function (ClientSession $session, $details){
-	terminal_log("Connection opened with role {$details->authrole}");
+start_connection($argv, function (ClientSession $session, $transport, $details){
+	terminal_log("Connection opened with role '{$details->authrole}'");
 
 	register_auth($session);
 	register_permissions($session);

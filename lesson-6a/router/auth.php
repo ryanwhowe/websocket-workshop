@@ -81,6 +81,10 @@ function register_permissions(ClientSession $session){
 			return $uri==='phpyork.subscribers';
 		}
 
+		if ($action==='subscribe' && $uri==='phpyork.broadcast'){
+			return true;
+		}
+
 		$thread = str_replace('phpyork.chat.', '', $uri);
 		if (!$thread){
 			terminal_log("No thread name found");

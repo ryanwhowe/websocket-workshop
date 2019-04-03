@@ -23,9 +23,9 @@ var alreet = (function (){
 		if (!thread){
 			throw "You must enter a thread name as first parameter";
 		}
-		const prefix = "phpyork.chat.";
+		const prefix = "phpyork.";
 		if (thread.indexOf(prefix)!==0){
-			thread = prefix+thread;
+			thread = prefix+"chat."+thread;
 		}
 		return thread;
 	}
@@ -49,7 +49,7 @@ var alreet = (function (){
 		thread = checkThread(thread);
 
 		var func = function (args){
-				console.log('Subscriber says: Got a message, it said: '+args.join(' '));
+				console.log('Subscriber says: Got a message to thread '+thread+', it said: '+args.join(' '));
 			};
 		session.subscribe(thread, func).then(function (){
 			console.log('Subscriber says: Yes, subscribed to '+thread+'!');
@@ -125,6 +125,9 @@ var alreet = (function (){
 			if (typeof callback==='function'){
 				callback(openedSession, details);
 			}
+
+			console.log("Will auto-subscribe to broadcast messages");
+			sub('phpyork.broadcast');
 		};
 
 		connection.onclose = function (reason, details){

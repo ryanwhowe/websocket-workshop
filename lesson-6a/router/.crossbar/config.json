@@ -42,6 +42,18 @@
               ]
             },
             {
+              "name": "pusher",
+              "permissions": [
+                {
+                  "uri": "phpyork.broadcast",
+                  "allow": {
+                    "publish": true
+                  },
+                  "cache": true
+                }
+              ]
+            },
+            {
               "name": "king",
               "permissions": [
                 {
@@ -178,6 +190,10 @@
                 "authenticator": {
                   "secret": "authenticator-kZ%3g@JR1oXb",
                   "role": "authenticator"
+                },
+                "pusher": {
+                  "secret": "pusher-0shVV4XQ#Fm#",
+                  "role": "pusher"
                 }
               }
             }
@@ -195,6 +211,18 @@
         "yorkshire",
         "authenticator",
         "authenticator-kZ%3g@JR1oXb"
+      ]
+    },
+    {
+      "type": "guest",
+      "executable": "/usr/bin/env",
+      "arguments": [
+        "php",
+        "../pusher.php",
+        "ws://127.0.0.1:9001",
+        "yorkshire",
+        "pusher",
+        "pusher-0shVV4XQ#Fm#"
       ]
     }
   ]

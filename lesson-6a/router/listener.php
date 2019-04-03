@@ -15,6 +15,10 @@ function subscribe_subs_create(ClientSession $session){
 		$topic = $details->uri;
 		$topic_id = $details->id;
 
+		if (strpos('phpyork.chat.', $topic)!==0){
+			return;
+		}
+
 		$user = redis_get("session-$subscriber_session_id");
 
 		terminal_log("A user $user ($subscriber_session_id) caused a topic to be created: '{$topic}' ({$topic_id})");
@@ -27,6 +31,7 @@ function subscribe_subs_create(ClientSession $session){
 }
 
 function subscribe_user_topic(ClientSession $session, string $topic){
+
 	subscribe($session, $topic, function ($args, $kwargs, $details) use ($topic){
 		$message = $args[0];
 		$user = $details->publisher_authid;

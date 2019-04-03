@@ -4,10 +4,14 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    environment:
+      - TZ=Europe/London
   redis_ui:
     image: marian/rebrow
     ports:
       - "5001:5001"
+    environment:
+      - TZ=Europe/London
   crossbar_1:
     build: docker/crossbar
     image: phpyorkshire/crossbar
@@ -60,6 +64,8 @@ services:
       - "8006:8000"
     volumes:
       - ./lesson-6/router:/app
+    environment:
+      - TZ=Europe/London
   crossbar_6a:
     build: docker/crossbar-php
     image: phpyorkshire/crossbar-php
@@ -67,6 +73,8 @@ services:
       - "8007:8000"
     volumes:
       - ./lesson-6a/router:/app
+    environment:
+      - TZ=Europe/London
     env_file:
       - ./docker/zmq.env
   http:
@@ -75,12 +83,16 @@ services:
       - "8081:80"
     volumes:
       - ./public:/usr/local/apache2/htdocs/
+    environment:
+      - TZ=Europe/London
   php_3:
     build: docker/php-client
     image: phpyorkshire/php
     volumes:
       - ./lesson-3/php:/app
     network_mode: "host"
+    environment:
+      - TZ=Europe/London
     command: php /app/client.php
   app_4:
     build: docker/php-app
@@ -90,6 +102,8 @@ services:
     volumes:
       - ./lesson-4/php:/app
       - ./db:/db
+    environment:
+      - TZ=Europe/London
     command: php -S 0.0.0.0:80 -t /app/
   app_5:
     build: docker/php-app
@@ -99,12 +113,28 @@ services:
     volumes:
       - ./lesson-5/php:/app
       - ./db:/db
+    environment:
+      - TZ=Europe/London
+    command: php -S 0.0.0.0:80 -t /app/
+  app_6:
+    build: docker/php-app
+    image: phpyorkshire/php-app
+    ports:
+      - "8016:80"
+    volumes:
+      - ./lesson-6a/php:/app
+    environment:
+      - TZ=Europe/London
+      - ADMIN_PASSWORD=abc123
+      - ADMIN_USER=RichardIII
+    env_file:
+      - ./docker/zmq.env
     command: php -S 0.0.0.0:80 -t /app/
   zmq_6:
     build: docker/php-zmq
     image: phpyorkshire/php-zmq
     volumes:
-      - ./lesson-6a/php:/app
+      - ./lesson-6a/zmq:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
