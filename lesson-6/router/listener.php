@@ -33,22 +33,28 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 		terminal_log("We snooped on a message from '{$user}' to topic '$topic' that said: '{$message}'");
 
 		$thread = str_replace('phpyork.chat.', '', $topic);
-		$url = "http://app_5/message";
-		try {
-			http_post($url, [
-				'user' => $details->publisher_authid,
-				'thread' => $thread,
-				'message' => $args[0],
-			]);
-		}
-		catch (Exception $e) {
-			terminal_log("Error: {$e->getMessage()}");
+		$data = [
+			'user' => $details->publisher_authid,
+			'thread' => $thread,
+			'message' => $args[0],
+		];
 
-			return;
-		}
-
-		terminal_log("Saved message via HTTP");
+		store_message($data);
 	});
+}
+
+function store_message(array $data){
+	$url = "http://app_5/message";
+	try {
+		http_post($url, $data);
+	}
+	catch (Exception $e) {
+		terminal_log("Error saving via HTTP: {$e->getMessage()}");
+
+		return;
+	}
+
+	terminal_log("Saved message via HTTP");
 }
 
 function subscribe_subs_sub(ClientSession $session){

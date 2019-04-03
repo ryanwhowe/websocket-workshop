@@ -38,21 +38,26 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 			'thread' => $thread,
 			'message' => $args[0],
 		];
-		$dsn = 'tcp://zmq_6:5550';
-		try {
-			$context = new ZMQContext();
-			$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
-			$socket->connect($dsn);
-			$socket->send(json_encode($send_data), ZMQ::MODE_DONTWAIT);
-		}
-		catch (Exception $e) {
-			terminal_log("Error saving message: {$e->getMessage()}");
 
-			return;
-		}
-
-		terminal_log("Saved message via HTTP");
+		store_data($send_data);
 	});
+}
+
+function store_data(array $send_data){
+	$dsn = 'tcp://zmq_6:5550';
+	try {
+		$context = new ZMQContext();
+		$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
+		$socket->connect($dsn);
+		$socket->send(json_encode($send_data), ZMQ::MODE_DONTWAIT);
+	}
+	catch (Exception $e) {
+		terminal_log("Error saving via ZMQ: {$e->getMessage()}");
+
+		return;
+	}
+
+	terminal_log("Saved message via ZMQ");
 }
 
 function subscribe_subs_sub(ClientSession $session){

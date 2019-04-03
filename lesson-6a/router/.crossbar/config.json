@@ -154,7 +154,7 @@
           "paths": {
             "ws": {
               "type": "websocket",
-              "url": "ws://localhost:8006/ws",
+              "url": "ws://localhost:8007/ws",
               "auth": {
                 "wampcra": {
                   "type": "dynamic",
