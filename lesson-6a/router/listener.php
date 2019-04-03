@@ -44,20 +44,19 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 }
 
 function store_data(array $send_data){
-	$dsn = 'tcp://zmq_6:5550';
+	$port = getenv('ZMQ_PORT');
+	$dsn = "tcp://zmq_6:$port";
 	try {
 		$context = new ZMQContext();
 		$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
 		$socket->connect($dsn);
 		$socket->send(json_encode($send_data), ZMQ::MODE_DONTWAIT);
+
+		terminal_log("Sent message to be saved via ZMQ (:$port)");
 	}
 	catch (Exception $e) {
-		terminal_log("Error saving via ZMQ: {$e->getMessage()}");
-
-		return;
+		terminal_log("Error sending via ZMQ (:$port): {$e->getMessage()}");
 	}
-
-	terminal_log("Saved message via ZMQ");
 }
 
 function subscribe_subs_sub(ClientSession $session){

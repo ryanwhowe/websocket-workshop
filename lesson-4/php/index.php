@@ -19,6 +19,8 @@ function cors_response(Response $response){
 		->withHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+date_default_timezone_set(getenv('TZ'));
+
 $config = [
 	'settings' => [
 		'displayErrorDetails' => true,

@@ -20,6 +20,8 @@ function terminal_log(string $msg){
 	echo "[$date] $msg\n";
 }
 
+date_default_timezone_set(getenv('TZ'));
+
 Logger::set(new NullLogger());
 
 define('USER', 'alan');

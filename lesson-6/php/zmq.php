@@ -8,3 +8,8 @@ function terminal_log(string $msg){
 	echo "[$date] $msg\n";
 }
 
+// Add your new functions here
+
+date_default_timezone_set(getenv('TZ'));
+
+// Add your procedural code here

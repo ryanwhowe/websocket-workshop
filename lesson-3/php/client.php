@@ -8,6 +8,8 @@ function terminal_log(string $msg){
 	echo "[$date] $msg\n";
 }
 
+date_default_timezone_set(getenv('TZ'));
+
 terminal_log("Hello. This is an example script");
 
 /*

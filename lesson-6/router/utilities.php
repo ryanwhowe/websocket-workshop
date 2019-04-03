@@ -57,4 +57,6 @@ function call(ClientSession $session, string $proc, array $args, callable $func)
 	$session->call($proc, $args)->then($func);
 }
 
+date_default_timezone_set(getenv('TZ'));
+
 Logger::set(new NullLogger());

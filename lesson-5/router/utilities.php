@@ -53,4 +53,6 @@ function subscribe(ClientSession $session, string $topic, callable $func){
 	});
 }
 
+date_default_timezone_set(getenv('TZ'));
+
 Logger::set(new NullLogger());

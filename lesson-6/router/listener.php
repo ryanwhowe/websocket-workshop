@@ -47,14 +47,12 @@ function store_message(array $data){
 	$url = "http://app_5/message";
 	try {
 		http_post($url, $data);
+
+		terminal_log("Saved message via HTTP");
 	}
 	catch (Exception $e) {
 		terminal_log("Error saving via HTTP: {$e->getMessage()}");
-
-		return;
 	}
-
-	terminal_log("Saved message via HTTP");
 }
 
 function subscribe_subs_sub(ClientSession $session){
