@@ -48,10 +48,10 @@ $app->post('/broadcast', function (Request $request, Response $response){
 	$port = getenv('ZMQ_PUSH_PORT');
 	$dsn = "tcp://crossbar_6a:$port";
 	try {
-		$context = new ZMQContext();
-		$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
-		$socket->connect($dsn);
-		$socket->send($message, ZMQ::MODE_DONTWAIT);
+	$context = new ZMQContext();
+	$socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
+	$socket->connect($dsn);
+	$socket->send($message, ZMQ::MODE_DONTWAIT);
 	}
 	catch (Exception $e) {
 		return $response->withStatus(500)->write("ZMQ Error ($dsn): {$e->getMessage()}");

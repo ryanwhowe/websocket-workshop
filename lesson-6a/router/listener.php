@@ -15,7 +15,7 @@ function subscribe_subs_create(ClientSession $session){
 		$topic = $details->uri;
 		$topic_id = $details->id;
 
-		if (strpos('phpyork.chat.', $topic)!==0){
+		if (strpos($topic, 'phpyork.chat.')!==0){
 			return;
 		}
 
@@ -74,6 +74,10 @@ function subscribe_subs_sub(ClientSession $session){
 
 		$topic_id = array_shift($args);
 		$topic = redis_get("topic-$topic_id");
+
+		if (!$topic){
+			return;
+		}
 
 		$user = redis_get("session-$subscriber_session_id");
 

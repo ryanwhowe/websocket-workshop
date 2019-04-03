@@ -14,6 +14,10 @@ require 'connection.php';
 
 $loop = \React\EventLoop\Factory::create();
 
+$loop->addPeriodicTimer(30, function (){
+	terminal_log("Still running, next update in 5 minutes...");
+});
+
 start_connection($argv, function (ClientSession $session, $transport, $details) use ($loop){
 	terminal_log("Connection opened with role '{$details->authrole}'");
 
@@ -26,21 +30,10 @@ start_connection($argv, function (ClientSession $session, $transport, $details) 
 
 	$pull->bind($bind_addr);
 
-	terminal_log("Bound");
-
 	// When we receive a message we then relay it out to users
 	$pull->on('message', function ($message) use ($session){
-		terminal_log("Received message $message");
+		terminal_log("Received message '$message'; will now broadcast it");
 
-		$session->publish('phpyork.broadcast', [$message])->then(function(){
-			terminal_log("Broadcast successfully");
-		}, function(){
-			terminal_log("Broadcast failed");
-			var_dump(func_get_args());
-		});
+		$session->publish('phpyork.broadcast', [$message]);
 	});
-});
-
-$loop->addPeriodicTimer(300, function (){
-	terminal_log("Still running, next update in 5 minutes...");
-});
+}, $loop);
