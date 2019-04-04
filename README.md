@@ -1149,9 +1149,62 @@ load on the WAMP cache in favour of a more scalable caching service like Redis.
 In this section we will cover:
 
 * Ensuring we don't block websockets with API calls
-* Allowing other applications to communicate outside of websockets
+* Allowing other applications to communicate with websocket users
 
+_Introduction to ZMQ and React Socket connections_
 
+### Lesson 6 Practical - Creating a ZMQ listener
+
+```
+$port = getenv('ZMQ_PORT');
+$dsn = "tcp://zmq_6:$port";
+try {
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
+    $socket->connect($dsn);
+    $socket->send(json_encode($send_data), ZMQ::MODE_DONTWAIT);
+
+    terminal_log("Sent message to be saved via ZMQ (:$port)");
+}
+catch (Exception $e) {
+    terminal_log("Error sending via ZMQ (:$port): {$e->getMessage()}");
+}
+```
+
+### Lesson 6 Practical - Messaging into websockets using ZMQ
+
+```
+$context = new \React\ZMQ\Context($loop);
+$pull = $context->getSocket(ZMQ::SOCKET_PULL);
+
+$bind_addr = "tcp://0.0.0.0:".getenv('ZMQ_PUSH_PORT');
+
+terminal_log("Listening on $bind_addr");
+
+$pull->bind($bind_addr);
+```
+
+```
+// When we receive a message we then relay it out to users
+$pull->on('message', function ($message) use ($session){
+    terminal_log("Received message '$message'");
+});
+```
+
+```
+$session->publish('phpyork.broadcast', [$message]);
+```
+
+```
+if ($action==='subscribe' && $uri==='phpyork.broadcast'){
+    return true;
+}
+```
+
+```
+console.log("Will auto-subscribe to broadcast messages");
+sub('phpyork.broadcast');
+```
 
 ## 7. Experiments with WebRTC
 

@@ -15,6 +15,12 @@ function subscribe_subs_create(ClientSession $session){
 		$topic = $details->uri;
 		$topic_id = $details->id;
 
+		// Added this as during this lesson users will subscribe to
+		// other named threads
+		if (strpos($topic, 'phpyork.chat.')!==0){
+			return;
+		}
+
 		$user = redis_get("session-$subscriber_session_id");
 
 		terminal_log("A user $user ($subscriber_session_id) caused a topic to be created: '{$topic}' ({$topic_id})");
@@ -33,13 +39,13 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 		terminal_log("We snooped on a message from '{$user}' to topic '$topic' that said: '{$message}'");
 
 		$thread = str_replace('phpyork.chat.', '', $topic);
-		$data = [
+		$send_data = [
 			'user' => $details->publisher_authid,
 			'thread' => $thread,
 			'message' => $args[0],
 		];
 
-		store_message($data);
+		store_data($send_data);
 	});
 }
 
@@ -65,6 +71,12 @@ function subscribe_subs_sub(ClientSession $session){
 
 		$topic_id = array_shift($args);
 		$topic = redis_get("topic-$topic_id");
+
+		// Helps when subscriptions to other threads occur
+		// but also in general no point continuing here if no $topic
+		if (!$topic){
+			return;
+		}
 
 		$user = redis_get("session-$subscriber_session_id");
 

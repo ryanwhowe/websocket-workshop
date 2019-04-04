@@ -125,9 +125,6 @@ var alreet = (function (){
 			if (typeof callback==='function'){
 				callback(openedSession, details);
 			}
-
-			console.log("Will auto-subscribe to broadcast messages");
-			sub('phpyork.broadcast');
 		};
 
 		connection.onclose = function (reason, details){
