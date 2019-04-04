@@ -8,6 +8,8 @@ use Thruway\ClientSession;
 
 require __DIR__.'/../vendor/autoload.php';
 
+define('LOG_NAME', 'Authenticator');
+
 require 'utilities.php';
 require 'connection.php';
 require 'auth.php';
