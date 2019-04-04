@@ -1441,3 +1441,6 @@ In this section we will cover:
 * Basic connection establishment
 * How websockets can be used to facilitate WebRTC connections
 * Tools & pitfalls for WebRTC development
+
+### Lesson 7 Practical - Serverless WebRTC
+
