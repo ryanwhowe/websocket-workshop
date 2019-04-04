@@ -7,7 +7,7 @@ use Thruway\ClientSession;
 
 require __DIR__.'/../vendor/autoload.php';
 
-define('LOG_NAME', 'Pusher');
+define('LOG_NAME', 'Broadcaster');
 
 require 'utilities.php';
 require 'connection.php';

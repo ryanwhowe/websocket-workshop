@@ -1282,11 +1282,23 @@ What's happening here?
 
 ### Lesson 6 Practical - Messaging into websockets using ZMQ
 
-App route ZMQ send
+Services outside of websockets may want to communicate with users in a websocket system. In a chat
+system it might be the case people can live chat but also send emails which get parsed and
+messaged to users. Or user actions on one part of a web route might need to relay to a control
+panel or dashboard.
+
+Having an application make a websocket connection as a one off to send a message defeats the
+point of persistent clients and complicates code bases - now your whole app needs to talk websockets.
+Instead the ZMQ concept we used to avoid blocking internally in a crossbar worker can be used.
+
+In `lesson-6/app/index.php` is a route concept for a broadcast message - a user authenticates and
+can message every user currently signed in on the crossbar server. The route already has the logic
+for the password check to avoid unnecessary heavy lifting. Below that (but above the return response)
+add the following code which should be quite familiar:
 
 ```
 $port = getenv('ZMQ_PUSH_PORT');
-$dsn = "tcp://crossbar_6a:$port";
+$dsn = "tcp://crossbar_6:$port";
 try {
     $context = new ZMQContext();
     $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
@@ -1298,13 +1310,23 @@ catch (Exception $e) {
 }
 ```
 
-Run this to test route (won't have any effect). Password is passed as env var in docker-compose.yml
+Other than handling an exception differently (we're now in web again remember) the rest of this looks
+identical to how we pushed from crossbar's listener.
+
+To test the route at least doesn't crash (should return a 204 response) run the following:
 
 ```
-curl -X POST -d '{"password": "abc123", "message": "Test broadcast"}' -H 'content-type: application/json' localhost:8016/broadcast
+curl -I -X POST -d '{"password": "abc123", "message": "Test broadcast"}' -H 'content-type: application/json' localhost:8016/broadcast
 ```
 
-Push listener crossbar worker config
+The password is an environment variable in `docker-compose.yaml` if you want to change it.
+
+To listen for these messages we could use our existing worker but that worker is already doing enough
+different things and really if we had time we'd split out the listening functionality from the authentication
+and permissions anyway. So the steps we use here to make the "broadcaster" could be copied and used
+to extract that functionality, or create workers for many other purposes
+
+Firstly near the bottom of `lesson-6/router/.crossbar/config.json` we add another worker:
 
 ```
 {
@@ -1312,29 +1334,30 @@ Push listener crossbar worker config
   "executable": "/usr/bin/env",
   "arguments": [
     "php",
-    "../pusher.php",
+    "../broadcaster.php",
     "ws://127.0.0.1:9001",
     "yorkshire",
-    "pusher",
-    "pusher-0shVV4XQ#Fm#"
+    "broadcaster",
+    "broadcaster-0shVV4XQ#Fm#"
   ]
 }
 ```
 
-Wampcra new user
+As with the authenticator we add a WAMPCRA key with the user name, static secret and role:
 
 ```
-"pusher": {
-  "secret": "pusher-0shVV4XQ#Fm#",
-  "role": "pusher"
+"broadcaster": {
+  "secret": "broadcaster-0shVV4XQ#Fm#",
+  "role": "broadcaster"
 }
 ```
 
-Push listener new role
+Above in the "yorkshire" realm we can add the new role as well. We haven't got to publishing
+just yet but to save time later this role has publish permission to a named topic already.
 
 ```
 {
-  "name": "pusher",
+  "name": "broadcaster",
   "permissions": [
     {
       "uri": "phpyork.broadcast",
@@ -1347,7 +1370,12 @@ Push listener new role
 }
 ```
 
-Push listener binding
+The `lesson-6/router/broadcaster.php` file already has some boilerplate. Note that we're
+retaining control of the `$loop` variable and passing it into the WAMP connection,
+combining what we saw with the standalone ZMQ service and existing WAMP connections.
+
+Inside the connection callback add the following, again familiar from when we wrote the ZMQ
+service above.
 
 ```
 $context = new \React\ZMQ\Context($loop);
@@ -1360,7 +1388,10 @@ terminal_log("Listening on $bind_addr");
 $pull->bind($bind_addr);
 ```
 
-Push listener on message
+Once again we listen on all interfaces. The ZMQ ports are being passed in via `docker/zmq.env`
+if for any reason you wish to change them.
+
+At present this is listening but doing nothing so to test it we can add:
 
 ```
 // When we receive a message we then relay it out to users
@@ -1369,13 +1400,19 @@ $pull->on('message', function ($message) use ($session){
 });
 ```
 
-Push listener publish
+Now restart the crossbar service (`bin/run-crossbar 6`) and execute the cURL request above; all
+being well we should see the message appear in the logs of our crossbar container.
+
+Once we have the message received the next part is simple - publish it out to a topic:
 
 ```
 $session->publish('phpyork.broadcast', [$message]);
 ```
 
-User permissions tweak
+We're now able to broadcast and with just a few small changes our users can receive them as well.
+Firstly assuming we're still testing with users who gain their permisisons from `register_permissions()`
+in `lesson-6/router/auth.php` we can add the following at line 83 (just below where we allow them
+to call "phpyork.subscribers" from lesson 5):
 
 ```
 if ($action==='subscribe' && $uri==='phpyork.broadcast'){
@@ -1383,14 +1420,18 @@ if ($action==='subscribe' && $uri==='phpyork.broadcast'){
 }
 ```
 
-Run inside alreet.connect on open
+Finally we could just run the subscription in console but for the real effect we can modify
+`public/6/script.js` to add this inside the `connection.onopen` callback (should be around
+line 126) so that users always get our broadcasts no matter what else they are doing:
 
 ```
 console.log("Will auto-subscribe to broadcast messages");
 sub('phpyork.broadcast');
 ```
 
-
+Now run `alreet.connect()` to create the subscription (it will show in the console log) and then
+execute the cURL command above to send the message to be published - if everything works this should
+show up in the user's browser console.
 
 ## 7. Experiments with WebRTC
 
