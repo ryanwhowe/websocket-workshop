@@ -89,7 +89,7 @@ services:
     ports:
       - "8014:80"
     volumes:
-      - ./lesson-4/php:/app
+      - ./lesson-4/app:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
@@ -100,7 +100,7 @@ services:
     ports:
       - "8015:80"
     volumes:
-      - ./lesson-5/php:/app
+      - ./lesson-5/app:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
@@ -111,7 +111,7 @@ services:
     ports:
       - "8016:80"
     volumes:
-      - ./lesson-6/php:/app
+      - ./lesson-6/app:/app
     environment:
       - TZ=Europe/London
       - ADMIN_PASSWORD=abc123

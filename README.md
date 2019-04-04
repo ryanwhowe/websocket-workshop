@@ -783,7 +783,7 @@ Then it will work for us correctly.
 
 Most likely your application will already have an authentication system and you will
 want to connect this to your websocket system. To test this we've built a simple app
-using the Slim framework which can be seen in `lesson-4/php/index.php`
+using the Slim framework which can be seen in `lesson-4/app/index.php`
 
 The app has the following endpoints set up:
 
@@ -1155,6 +1155,17 @@ _Introduction to ZMQ and React Socket connections_
 
 ### Lesson 6 Practical - Creating a ZMQ listener
 
+A file is ready at `lesson-6/zmq/zmq.php` to work on for this next part. To restart the ZMQ service
+and watch its logs execute `bin/run-zmq`.
+
+In case we've forgotten from lesson 3 we need an event loop to run a persistent script. What we might
+have missed during all the crossbar worker examples is that Thruway's WAMP connection actually
+implements its own internal loop when you create the connection and tell it to connect.
+
+As well as the loop we can add a one-off action to let us know the loop started OK and then a regular
+signal so we have something in logs to indicate it is still working. In a real system this would be
+a great place to send a metric to Datadog or AWS Cloudwatch that could alarm if missing.
+
 ```
 $loop = \React\EventLoop\Factory::create();
 
@@ -1169,6 +1180,12 @@ $loop->addPeriodicTimer(300, function (){
 $loop->run();
 ```
 
+A loop on its own doesn't do much good. Setting up ZMQ is very easy using React - note that this
+also only works because we built a container using the ZMQ library from PECL. It's been well
+looked after in the transition to PHP 7 though can sometimes lag a bit behind new versions in beta.
+
+Add all the following code _before_ the $loop-run() command or you'll get odd behaviour.
+
 ```
 $port = getenv('ZMQ_PORT');
 terminal_log("Will bind to port: $port");
@@ -1178,23 +1195,29 @@ $pull = $context->getSocket(ZMQ::SOCKET_PULL);
 $pull->bind("tcp://0.0.0.0:$port");
 ```
 
+Note that we bind on all interfaces - you might not do this in circumstances where your machine
+has a known IP and you are taking completely internal connections, but in a docker network or a
+private VPC on a cloud provider this is sensible as you might not know your machine IP.
+
+Also remember that this ZMQ service is on the "app" side of our architecture, so it could even live
+inside the repository and share a server with your app code if you don't use containers or microsservices
+in production.
+
+Now we have a bind address we need to do something with an incoming message.
+
 ```
-$pull->on('message', function ($json){
-	terminal_log("Got a JSON message: $json");
+$pull->on('message', function ($message){
+	terminal_log("Got a message: $message");
 });
 ```
 
-```
-try {
-    store_message($json);
-    terminal_log("Saved message to database");
-}
-catch (Exception $e){
-    terminal_log("Storage error: {$e->getMessage()}");
-}
-```
+At this point our ZMQ service is set up but nothing is sending it any details. This is
+an easy fix because our listening code from lesson 5 has been neatly refactored already
+into `lesson-6/router/listener.php`
 
-New internals of listener.php store_data() function
+Check the `store_message()` function which carries out the HTTP call. We no longer want to
+block the listener when carrying out this call so we replace the whole inside of that message
+with the following code.
 
 ```
 $port = getenv('ZMQ_PORT');
@@ -1211,6 +1234,51 @@ catch (Exception $e) {
     terminal_log("Error sending via ZMQ (:$port): {$e->getMessage()}");
 }
 ```
+
+Hopefully you can see similarities between this and the previous code for the ZMQ service as part of
+the app. The difference is that whilst that opens a pull socket here we open a push socket.
+
+The 'persist socket' parameter can be any string but using this string describes what the parameter
+does more accurately. By setting the string it gives the socket a name and keeps it in use for future
+connection attempts that use the same string name.
+
+Now after restarting (`bin/run-crossbar 6`) we can carry out the process of:
+
+* A user signs in on browser
+* A user subscribes to a thread
+* A user publishes a message
+
+That we got used to testing in lesson 5. If you watch the logs for the ZMQ app listener 
+(`docker-compose logs -f zmq_6`) then you should see the message arrive from the crossbar listener.
+
+All we need now is to save it; we're assuming this service has access to the same storage as the 
+HTTP app written in Slim, and for convenience the data saving logic from there has been copied over
+even though the ZMQ script doesn't use Slim itself.
+
+Copy the following inside the `on('message'` callback after the log:
+
+```
+try {
+    store_message($message);
+    terminal_log("Saved message to database");
+}
+catch (Exception $e){
+    terminal_log("Storage error: {$e->getMessage()}");
+}
+```
+
+Restart the ZMQ service (`bin/run-zmq`) again, send another message (no need to restart crossbar or
+have the user connect again) and watch it get saved to the database. Now we can store messages
+without blocking the crossbar listener.
+
+### Aside
+
+Try stopping the ZMQ listener (`docker-compose stop zmq_6`). Now send a message and watch the
+crossbar listener report that it has saved via ZMQ. You know it hasn't because the listener was down.
+Then try starting the listener (`bin/run-zmq`) and watch as it receives the message sent whilst
+it was down.
+
+What's happening here?
 
 ### Lesson 6 Practical - Messaging into websockets using ZMQ
 

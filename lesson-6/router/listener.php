@@ -45,14 +45,14 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 			'message' => $args[0],
 		];
 
-		store_data($send_data);
+		store_message($send_data);
 	});
 }
 
-function store_message(array $data){
+function store_message(array $send_data){
 	$url = "http://app_5/message";
 	try {
-		http_post($url, $data);
+		http_post($url, $send_data);
 
 		terminal_log("Saved message via HTTP");
 	}
