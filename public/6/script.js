@@ -2,8 +2,7 @@ console.log("Welcome to lesson 6");
 
 var alreet = (function (){
 	var session, connection;
-	// @todo change this to 8005 for the lesson
-	const url = "ws://localhost:8007/ws";
+	const url = "ws://localhost:8006/ws";
 
 	var token;
 	const config = {

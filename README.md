@@ -1156,6 +1156,47 @@ _Introduction to ZMQ and React Socket connections_
 ### Lesson 6 Practical - Creating a ZMQ listener
 
 ```
+$loop = \React\EventLoop\Factory::create();
+
+$loop->addTimer(1, function (){
+	terminal_log("Loop was started, will report that it is still running every 5 minutes");
+});
+
+$loop->addPeriodicTimer(300, function (){
+	terminal_log("Still running, next update in 5 minutes...");
+});
+
+$loop->run();
+```
+
+```
+$port = getenv('ZMQ_PORT');
+terminal_log("Will bind to port: $port");
+
+$context = new \React\ZMQ\Context($loop);
+$pull = $context->getSocket(ZMQ::SOCKET_PULL);
+$pull->bind("tcp://0.0.0.0:$port");
+```
+
+```
+$pull->on('message', function ($json){
+	terminal_log("Got a JSON message: $json");
+});
+```
+
+```
+try {
+    store_message($json);
+    terminal_log("Saved message to database");
+}
+catch (Exception $e){
+    terminal_log("Storage error: {$e->getMessage()}");
+}
+```
+
+New internals of listener.php store_data() function
+
+```
 $port = getenv('ZMQ_PORT');
 $dsn = "tcp://zmq_6:$port";
 try {
@@ -1173,6 +1214,73 @@ catch (Exception $e) {
 
 ### Lesson 6 Practical - Messaging into websockets using ZMQ
 
+App route ZMQ send
+
+```
+$port = getenv('ZMQ_PUSH_PORT');
+$dsn = "tcp://crossbar_6a:$port";
+try {
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'persist socket');
+    $socket->connect($dsn);
+    $socket->send($message, ZMQ::MODE_DONTWAIT);
+}
+catch (Exception $e) {
+    return $response->withStatus(500)->write("ZMQ Error ($dsn): {$e->getMessage()}");
+}
+```
+
+Run this to test route (won't have any effect). Password is passed as env var in docker-compose.yml
+
+```
+curl -X POST -d '{"password": "abc123", "message": "Test broadcast"}' -H 'content-type: application/json' localhost:8016/broadcast
+```
+
+Push listener crossbar worker config
+
+```
+{
+  "type": "guest",
+  "executable": "/usr/bin/env",
+  "arguments": [
+    "php",
+    "../pusher.php",
+    "ws://127.0.0.1:9001",
+    "yorkshire",
+    "pusher",
+    "pusher-0shVV4XQ#Fm#"
+  ]
+}
+```
+
+Wampcra new user
+
+```
+"pusher": {
+  "secret": "pusher-0shVV4XQ#Fm#",
+  "role": "pusher"
+}
+```
+
+Push listener new role
+
+```
+{
+  "name": "pusher",
+  "permissions": [
+    {
+      "uri": "phpyork.broadcast",
+      "allow": {
+        "publish": true
+      },
+      "cache": true
+    }
+  ]
+}
+```
+
+Push listener binding
+
 ```
 $context = new \React\ZMQ\Context($loop);
 $pull = $context->getSocket(ZMQ::SOCKET_PULL);
@@ -1184,6 +1292,8 @@ terminal_log("Listening on $bind_addr");
 $pull->bind($bind_addr);
 ```
 
+Push listener on message
+
 ```
 // When we receive a message we then relay it out to users
 $pull->on('message', function ($message) use ($session){
@@ -1191,9 +1301,13 @@ $pull->on('message', function ($message) use ($session){
 });
 ```
 
+Push listener publish
+
 ```
 $session->publish('phpyork.broadcast', [$message]);
 ```
+
+User permissions tweak
 
 ```
 if ($action==='subscribe' && $uri==='phpyork.broadcast'){
@@ -1201,10 +1315,14 @@ if ($action==='subscribe' && $uri==='phpyork.broadcast'){
 }
 ```
 
+Run inside alreet.connect on open
+
 ```
 console.log("Will auto-subscribe to broadcast messages");
 sub('phpyork.broadcast');
 ```
+
+
 
 ## 7. Experiments with WebRTC
 

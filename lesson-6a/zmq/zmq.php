@@ -64,6 +64,14 @@ date_default_timezone_set(getenv('TZ'));
 
 $loop = \React\EventLoop\Factory::create();
 
+$loop->addTimer(1, function (){
+	terminal_log("Loop was started, will report that it is still running every 5 minutes");
+});
+
+$loop->addPeriodicTimer(300, function (){
+	terminal_log("Still running, next update in 5 minutes...");
+});
+
 $port = getenv('ZMQ_PORT');
 terminal_log("Will bind to port: $port");
 
@@ -81,14 +89,6 @@ $pull->on('message', function ($json){
 	catch (Exception $e){
 		terminal_log("Storage error: {$e->getMessage()}");
 	}
-});
-
-$loop->addTimer(1, function (){
-	terminal_log("Loop was started, will report that it is still running every 5 minutes");
-});
-
-$loop->addPeriodicTimer(300, function (){
-	terminal_log("Still running, next update in 5 minutes...");
 });
 
 $loop->run();

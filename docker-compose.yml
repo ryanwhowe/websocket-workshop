@@ -66,17 +66,6 @@ services:
       - ./lesson-6/router:/app
     environment:
       - TZ=Europe/London
-  crossbar_6a:
-    build: docker/crossbar-php
-    image: phpyorkshire/crossbar-php
-    ports:
-      - "8007:8000"
-    volumes:
-      - ./lesson-6a/router:/app
-    environment:
-      - TZ=Europe/London
-    env_file:
-      - ./docker/zmq.env
   http:
     image: httpd:2.4
     ports:
@@ -122,7 +111,7 @@ services:
     ports:
       - "8016:80"
     volumes:
-      - ./lesson-6a/php:/app
+      - ./lesson-6/php:/app
     environment:
       - TZ=Europe/London
       - ADMIN_PASSWORD=abc123
@@ -134,7 +123,7 @@ services:
     build: docker/php-zmq
     image: phpyorkshire/php-zmq
     volumes:
-      - ./lesson-6a/zmq:/app
+      - ./lesson-6/zmq:/app
       - ./db:/db
     environment:
       - TZ=Europe/London
