@@ -2,7 +2,7 @@ console.log("Welcome to lesson 7.\n" +
 	"If you are Alice you'll join Bob's chat - start by calling Alice.findBob() where the only argument is Bob's IP\n" +
 	"If you are Bob you'll create a chat; get your connection string then call Bob.startChatWithAlice() where the only argument is that string");
 
-var connection = function(url, callback){
+var wampConnection = function(url, callback){
 	var session, connection;
 
 	function connect(url, callback){
@@ -48,9 +48,13 @@ var Alice = (function(){
 	var singleton, connection;
 
 	function findBob(bobsIp){
-		connection = connection('ws://'+bobsIp+':8007/ws', function(session){
+		if (!bobsIp){
+			throw "You must enter a valid IP address for Bob as the only argument for this method";
+		}
+
+		connection = wampConnection('ws://'+bobsIp+':8007/ws', function(session){
 			session.subscribe('create', function(args){
-				console.log("Bob's connection string follows. Enter this into the join chat window, then come back and use 'Alice.respondToBob()' with the connection string that your browser subsequently generates: ", args[0]);
+				console.log("Bob's connection string follows. Click 'Join' and enter this string into the window, then click 'Okay I pasted it': ", args[0]);
 			}).then(function (){
 				console.log('Subscribed to "create", waiting for Bob to message');
 			}, function (error){
@@ -59,13 +63,16 @@ var Alice = (function(){
 		});
 	}
 
-	function respondToBob(alicesICEString){
+	function respondToBob(connectionString){
 		if (!connection){
 			throw "Must have already called findBob(bobsIp)";
 		}
+		if (!connectionString){
+			throw "You must enter Alice's connection string as the only argument for this method";
+		}
 
-		session.publish('create', [alicesICEString], {}, {acknowledge: true}).then(function (){
-			console.log("Sent Alice's connection string to Bob");
+		connection.getSession().publish('respond', [connectionString], {}, {acknowledge: true}).then(function (){
+			console.log("Sent Alice's connection string to Bob. Now click 'Okay I sent it'");
 		}, function (error){
 			console.log("Couldn't send Alice's connection string to Bob: "+error.args[0]);
 		});
@@ -82,16 +89,20 @@ var Alice = (function(){
 var Bob = (function(){
 	var singleton;
 
-	function startChatWithAlice(bobsICEString){
-		connection = connection('ws://localhost:8007/ws', function(session){
-			session.publish('create', [bobsICEString], {}, {acknowledge: true}).then(function (){
-				console.log("Sent Bob's connection string to Alice. Click continue in the window and wait for Alice's connection string to be sent");
+	function startChatWithAlice(connectionString){
+		if (!connectionString){
+			throw "You must enter Bob's connection string as the only argument for this method";
+		}
+
+		wampConnection('ws://localhost:8007/ws', function(session){
+			session.publish('create', [connectionString], {}, {acknowledge: true}).then(function (){
+				console.log("Sent Bob's connection string to Alice. Click 'Okay I sent it' then wait for Alice's connection string to be sent");
 			}, function (error){
 				console.log("Couldn't send Bob's connection string to Alice: "+error.args[0]);
 			});
 
 			session.subscribe('respond', function(args){
-				console.log("Alice's connection string follows. Enter this into the partner response window, then click continue: ", args[0]);
+				console.log("Alice's connection string follows. Enter this and then click 'Okay I pasted it': ", args[0]);
 			}).then(function (){
 				console.log('Subscribed to "respond", waiting for Alice to message');
 			}, function (error){

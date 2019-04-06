@@ -1444,35 +1444,7 @@ In this section we will cover:
 
 ### Lesson 7 Practical - Serverless WebRTC
 
-Visit `http://localhost:8082/` in a browser.
-
-Plan for crossbar provider:
-
-Alice & Bob. Alice connects to Bob's crossbar.
-
-Order of operations:
-
-alice.findBob(bobs_ip)
-    Opens websocket connection to bob
-    Subscribes to "create"
-    
-Now bob does "Create" and gets the string to copy
-
-bob.startChatWithAlice(bobs_ICE_string)
-    Opens websocket connection to self
-    Subscribes to "respond"
-    Publishes ICE string to "create"
-    
-Bob clicks that they have sent
-    
-Alice receives this in browser, clicks Join, pastes
-Then gets the response and does:
-
-alice.respondToBob(alices_ICE_string)
-    Publishes ICE string to "respond"
-    
-Alice clicks that they have sent
-    
-Bob receives this in browser, pastes
-
-Now chat should be established
+Visit `http://localhost:8081/7/` in a browser. The instructions for how to continue are on that page.
+You will need to pair up, choose a character and follow the instructions to try and establish a 
+"serverless" WebRTC connection. In actual fact we are using a server because during the workshop it's
+hard to know how to accurately move a long and complex string between two devices!
