@@ -66,6 +66,15 @@ services:
       - ./lesson-6/router:/app
     environment:
       - TZ=Europe/London
+  crossbar_7:
+    build: docker/crossbar
+    image: phpyorkshire/crossbar
+    ports:
+      - "8007:8000"
+    volumes:
+      - ./lesson-7/router:/app
+    environment:
+      - TZ=Europe/London
   http:
     image: httpd:2.4
     ports:
