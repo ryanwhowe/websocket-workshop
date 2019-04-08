@@ -45,7 +45,7 @@ In this section we will cover:
 We'll start some practical work after a bit of intro on the slides; but first try running:
 
 ```
-docker-compose build
+docker-compose up -d
 ```
 
 From the root of this project (or if not, specify the path to the project's `docker-compose.yml` file anyway).
@@ -266,8 +266,6 @@ alreet.setConfig({
   authid: 'steve'
 }).connectAgain();
 ```
-
-_We'll now discuss a few more authentication principles to finish_
 
 ## 3. Websockets in PHP
 
@@ -1271,14 +1269,7 @@ Restart the ZMQ service (`bin/run-zmq`) again, send another message (no need to 
 have the user connect again) and watch it get saved to the database. Now we can store messages
 without blocking the crossbar listener.
 
-### Aside
-
-Try stopping the ZMQ listener (`docker-compose stop zmq_6`). Now send a message and watch the
-crossbar listener report that it has saved via ZMQ. You know it hasn't because the listener was down.
-Then try starting the listener (`bin/run-zmq`) and watch as it receives the message sent whilst
-it was down.
-
-What's happening here?
+_Fun experiment, on the slides, at this point_
 
 ### Lesson 6 Practical - Messaging into websockets using ZMQ
 
@@ -1448,3 +1439,20 @@ Visit `http://localhost:8081/7/` in a browser. The instructions for how to conti
 You will need to pair up, choose a character and follow the instructions to try and establish a 
 "serverless" WebRTC connection. In actual fact we are using a server because during the workshop it's
 hard to know how to accurately move a long and complex string between two devices!
+
+## References
+
+There's a growing wealth of information online to help learn about real time web applications.
+Here are a few selections to continue the learning or act as more of a reference:
+
+* [ZeroMQ guide](http://zguide.zeromq.org/page:all) - in particular check out "Why we needed ZeroMQ"
+* [CrossbarIO docs](https://crossbar.io/docs/) - their new documentation is missing a few parts but has
+   lots of links to good quality examples
+* [AutobahnJS docs](https://github.com/crossbario/autobahn-js/blob/master/doc/getting-started.md)
+* [Websocket protocol](https://www.linode.com/docs/development/introduction-to-websockets/) - at a lower
+   level than crossbar, this guide from Linode goes over the basics of the connection and data transfer
+   components in a websocket system
+* [Callstats](https://www.callstats.io/) - if you're using WebRTC in production then monitoring is key
+   and callstats is a quality service. It's high price is reasonable given the complexity of the WebRTC
+   landscape
+* [React PHP](https://reactphp.org/) - also lists Ratchet and Thruway components
