@@ -1,4 +1,4 @@
-FROM composer AS composer
+FROM composer AS composertemp
 
 COPY composer.* /app/
 
@@ -8,7 +8,7 @@ FROM php:7.2-cli
 
 COPY . .
 
-COPY --from=composer /app/vendor/ vendor/
+COPY --from=composertemp /app/vendor/ vendor/
 
 LABEL name="phpyorkshire/crossbar-php"
 
