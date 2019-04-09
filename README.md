@@ -14,7 +14,7 @@
 ## Pre-installation requirements
 
 * git
-* docker
+* docker (17.05 or higher)
 * docker-compose (for convenience you might alias this to `dc` in your shell)
 * Firefox or Chromium (any derivative)
 * tail (seriously surprised if you're missing this)
