@@ -113,10 +113,10 @@ $app->get('/access', function (Request $request, Response $response, $args){
 	}
 
 	$thread = $request->getQueryParam('thread');
-	$user = $request->getQueryParam('name');
+	$user = $request->getQueryParam('user');
 
 	if (!$user || !$thread){
-		return $response->withStatus(400)->write("You must enter a 'thread' and 'name' query string");
+		return $response->withStatus(400)->write("You must enter a 'thread' and 'user' query string");
 	}
 
 	/**

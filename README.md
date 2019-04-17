@@ -254,7 +254,7 @@ We can secure this by making the following changes: ticket->wampcra, principals-
 
 * Change the field name inside the path declaration from `ticket` to `wampcra`
 * Modify the array field name from `principals` to `users`
-* Within each entity (larry and steve) modify their `ticket` to `secret` - now these actually become secrets
+* Within each entity (barry and steve) modify their `ticket` to `secret` - now these actually become secrets
 
 ```
 alreet.setConfig({
@@ -890,7 +890,7 @@ can be carried out in the browser as follows:
 
 ```
 login(user, password)
-const thread = 'phpyork.chat.thread-permalink'
+const thread = 'phpyork.chat.some-thread'
 alreet.connect().sub(thread).pub(thread, 'Hello to you');
 ```
 
@@ -1095,7 +1095,7 @@ We can now call this in a browser. Try connecting, subscribing to a topic (make 
 successful) and then run this in the browser console:
 
 ```
-alreet.call('your-thread-name')
+alreet.call('some-thread')
 ```
 
 If it works the output should be a JSON encoded list of user names. To debug the Redis store
@@ -1182,7 +1182,7 @@ A loop on its own doesn't do much good. Setting up ZMQ is very easy using React 
 also only works because we built a container using the ZMQ library from PECL. It's been well
 looked after in the transition to PHP 7 though can sometimes lag a bit behind new versions in beta.
 
-Add all the following code _before_ the $loop-run() command or you'll get odd behaviour.
+Add all the following code _before_ the $loop->run() command or you'll get odd behaviour.
 
 ```
 $port = getenv('ZMQ_PORT');

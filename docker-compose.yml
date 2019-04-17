@@ -66,6 +66,8 @@ services:
       - ./lesson-6/router:/app
     environment:
       - TZ=Europe/London
+    env_file:
+      - ./docker/zmq.env
   crossbar_7:
     build: docker/crossbar
     image: phpyorkshire/crossbar

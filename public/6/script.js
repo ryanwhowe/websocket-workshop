@@ -42,6 +42,8 @@ var alreet = (function (){
 		}, function (error){
 			console.log('Publisher says: Oh no, publishing to '+thread+' went wrong: '+error.args[0]);
 		});
+
+		return singleton;
 	}
 
 	function sub(thread){
@@ -55,6 +57,8 @@ var alreet = (function (){
 		}, function (error){
 			console.log('Subscriber says: Oh no, subscribing to '+thread+' went wrong: '+error.args[0]);
 		});
+
+		return singleton;
 	}
 
 	function call(thread){
@@ -67,6 +71,8 @@ var alreet = (function (){
 		}, function (){
 			console.log('Procedure caller says: Oh no, calling '+name+' went wrong. I got these arguments: ', arguments);
 		});
+
+		return singleton;
 	}
 
 	function reg(func, name){
@@ -82,6 +88,8 @@ var alreet = (function (){
 		}, function (){
 			console.log('Call provider says: Oh no, registering '+name+' went wrong. I got these arguments: ', arguments);
 		});
+
+		return singleton;
 	}
 
 	function setRealm(realm){
@@ -135,6 +143,8 @@ var alreet = (function (){
 
 		console.log("Connecting to websocket server (realm is "+realm+", using auth "+JSON.stringify(auth)+"):");
 		connection.open();
+
+		return singleton;
 	}
 
 	function getSession(){
