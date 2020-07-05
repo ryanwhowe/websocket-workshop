@@ -182,8 +182,14 @@ function login(user, password){
 	};
 
 	fetch(url, options).then(function(response) {
-		console.log('Login successful, setting token on websocket');
 		response.json().then(function(data){
+			if (data.error){
+				console.error(data.error)
+				return;
+			}
+
+			console.log('Login successful, setting token on websocket');
+
 			wsWorkshop.setAuth(user, data.token);
 		});
 	}).catch(function(error){
