@@ -17,7 +17,7 @@ function subscribe_subs_create(ClientSession $session){
 
 		// Added this as during this lesson users will subscribe to
 		// other named threads
-		if (strpos($topic, 'ws-workshop.chat.')!==0){
+		if (strpos($topic, 'workshop.chat.')!==0){
 			return;
 		}
 
@@ -38,7 +38,7 @@ function subscribe_user_topic(ClientSession $session, string $topic){
 		$user = $details->publisher_authid;
 		terminal_log("We snooped on a message from '{$user}' to topic '$topic' that said: '{$message}'");
 
-		$thread = str_replace('ws-workshop.chat.', '', $topic);
+		$thread = str_replace('workshop.chat.', '', $topic);
 		$send_data = [
 			'user' => $details->publisher_authid,
 			'thread' => $thread,
@@ -118,15 +118,15 @@ function call_list_subscribers(ClientSession $session, string $topic_id){
 }
 
 function register_get_subscribers(ClientSession $session){
-	register($session, 'ws-workshop.subscribers', function($args){
+	register($session, 'workshop.subscribers', function($args){
 		$topic = $args[0];
 		if (!$topic){
 			terminal_log("No topic supplied to check users");
 			return '[]';
 		}
 
-		if (strpos($topic, "ws-workshop.chat.")!==0){
-			$topic = "ws-workshop.chat.$topic";
+		if (strpos($topic, "workshop.chat.")!==0){
+			$topic = "workshop.chat.$topic";
 		}
 
 		$users = redis_get($topic);

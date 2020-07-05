@@ -508,12 +508,12 @@ authenticating via WAMPCRA. So replace the whole of the existing `auth` object w
 "auth": {
     "wampcra": {
       "type": "dynamic",
-      "authenticator": "ws-workshop.auth"
+      "authenticator": "workshop.auth"
     }
   }
 ```
 
-The worker will act just like a regular client and register a procedure, specified above as "ws-workshop.auth"
+The worker will act just like a regular client and register a procedure, specified above as "workshop.auth"
 This means the worker itself needs a role, which we can add now. We'll go back to the "wsWorkshop" realm
 for this next step.
 
@@ -523,7 +523,7 @@ for this next step.
       "name": "authenticator",
       "permissions": [
         {
-          "uri": "ws-workshop.auth",
+          "uri": "workshop.auth",
           "allow": {
             "register": true
           },
@@ -545,7 +545,7 @@ might make sense for British history buffs later...)
   "name": "type-a",
   "permissions": [
     {
-      "uri": "ws-workshop.",
+      "uri": "workshop.",
       "match": "prefix",
       "allow": {
         "call": false,
@@ -583,12 +583,12 @@ the worker via the command line. Add this above the WAMPCRA function that is alr
 in from lesson 3:
 
 ```
-list ($url, $realm, $user, $password) = array_slice($argv, 1);
+[$url, $realm, $user, $password] = array_slice($argv, 1);
 ```
 
 We can also copy in the basic connection block:
 
-```
+``` 
 $connection = new Connection([
 	"realm" => $realm,
 	"url" => $url,
@@ -616,7 +616,7 @@ Now we have the basic client similar to lesson 3. Inside the connection we can r
 that matches the name we supplied in the authentication config:
 
 ```
-$name = 'ws-workshop.auth';
+$name = 'workshop.auth';
 $session->register($name, function (){
     return [
         'role' => 'type-a',
@@ -703,7 +703,7 @@ a procedure to determine user permissions.
 This first requires a modification of the `config.json` file again. Rather than adding a new
 permission to our authenticator role we can just widen the scope a little. Change:
 
-`"uri": "ws-workshop.auth"` to `"uri": "ws-workshop."` and then on the line below add a new field:
+`"uri": "workshop.auth"` to `"uri": "workshop."` and then on the line below add a new field:
 
 ```
 "match": "prefix",
@@ -716,7 +716,7 @@ Then following the "type-a" role we can add another role:
 ```
 {
   "name": "type-b",
-  "authorizer": "ws-workshop.permissions",
+  "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
     "publisher": true
@@ -738,7 +738,7 @@ prodecure step, this time for permissions. Rather than build it bit by bit we're
 in the whole block and can then talk about it more
 
 ```
-$name = 'ws-workshop.permissions';
+$name = 'workshop.permissions';
 $session->register($name, function ($args){
     $details = array_shift($args);
     $uri = array_shift($args);
@@ -746,11 +746,11 @@ $session->register($name, function ($args){
 
     terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
 
-    if ($action==='publish' && strpos($uri, "ws-workshop.chat")===0){
+    if ($action==='publish' && strpos($uri, "workshop.chat")===0){
         return ['allow' => true, 'disclose' => true, 'cache' => true];
     }
 
-    if ($action==='subscribe' && strpos($uri, "ws-workshop.chat")===0){
+    if ($action==='subscribe' && strpos($uri, "workshop.chat")===0){
         return ['allow' => true, 'cache' => true];
     }
 
@@ -771,7 +771,7 @@ The role should connect but then be unable to subscribe to our default "test" to
 we follow the rules we've set for ourselves in the above permissions procedure and do:
 
 ```
-wsWorkshop.sub(null, 'ws-workshop.chat')
+wsWorkshop.sub(null, 'workshop.chat')
 ```
 
 Then it will work for us correctly.
@@ -798,7 +798,7 @@ roles if needed later.
 ```
 {
   "name": "type-c",
-  "authorizer": "ws-workshop.permissions",
+  "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
     "publisher": true
@@ -864,7 +864,7 @@ if (in_array($action, ['call', 'register'])){
     return false;
 }
 
-$thread = str_replace('ws-workshop.chat.', '', $uri);
+$thread = str_replace('workshop.chat.', '', $uri);
 if (!$thread){
     terminal_log("No thread name found");
     return false;
@@ -889,7 +889,7 @@ can be carried out in the browser as follows:
 
 ```
 login(user, password)
-const thread = 'ws-workshop.chat.some-thread'
+const thread = 'workshop.chat.some-thread'
 wsWorkshop.connect().sub(thread).pub(thread, 'Hello to you');
 ```
 
@@ -946,7 +946,7 @@ And again we need permission to do this:
 
 ```
 {
-  "uri": "ws-workshop.chat.",
+  "uri": "workshop.chat.",
   "match": "prefix",
   "allow": {
     "subscribe": true
@@ -961,7 +961,7 @@ call to our application with the user's message, saving it to a database. Add th
 in our "listening" subscription:
 
 ```
-$thread = str_replace('ws-workshop.chat.', '', $topic);
+$thread = str_replace('workshop.chat.', '', $topic);
 
 $url = "http://app_5/message";
 try {
@@ -1050,15 +1050,15 @@ this stage and let any user call it, rather than restricting to thread access. T
 will need to register this procedure:
 
 ```
-register($session, 'ws-workshop.subscribers', function($args){
+register($session, 'workshop.subscribers', function($args){
     $topic = $args[0];
     if (!$topic){
         terminal_log("No topic supplied to check users");
         return '[]';
     }
 
-    if (strpos($topic, "ws-workshop.chat.")!==0){
-        $topic = "ws-workshop.chat.$topic";
+    if (strpos($topic, "workshop.chat.")!==0){
+        $topic = "workshop.chat.$topic";
     }
 
     $users = redis_get($topic);
@@ -1086,7 +1086,7 @@ if ($action==='register'){
 }
 
 if ($action==='call'){
-    return $uri==='ws-workshop.subscribers';
+    return $uri==='workshop.subscribers';
 }
 ```
 
@@ -1350,7 +1350,7 @@ just yet but to save time later this role has publish permission to a named topi
   "name": "broadcaster",
   "permissions": [
     {
-      "uri": "ws-workshop.broadcast",
+      "uri": "workshop.broadcast",
       "allow": {
         "publish": true
       },
@@ -1396,16 +1396,16 @@ being well we should see the message appear in the logs of our crossbar containe
 Once we have the message received the next part is simple - publish it out to a topic:
 
 ```
-$session->publish('ws-workshop.broadcast', [$message]);
+$session->publish('workshop.broadcast', [$message]);
 ```
 
 We're now able to broadcast and with just a few small changes our users can receive them as well.
 Firstly assuming we're still testing with users who gain their permisisons from `register_permissions()`
 in `lesson-6/router/auth.php` we can add the following at line 83 (just below where we allow them
-to call "ws-workshop.subscribers" from lesson 5):
+to call "workshop.subscribers" from lesson 5):
 
 ```
-if ($action==='subscribe' && $uri==='ws-workshop.broadcast'){
+if ($action==='subscribe' && $uri==='workshop.broadcast'){
     return true;
 }
 ```
@@ -1416,7 +1416,7 @@ line 126) so that users always get our broadcasts no matter what else they are d
 
 ```
 console.log("Will auto-subscribe to broadcast messages");
-sub('ws-workshop.broadcast');
+sub('workshop.broadcast');
 ```
 
 Now run `wsWorkshop.connect()` to create the subscription (it will show in the console log) and then

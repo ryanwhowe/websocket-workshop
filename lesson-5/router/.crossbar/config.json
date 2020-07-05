@@ -12,7 +12,7 @@
               "name": "authenticator",
               "permissions": [
                 {
-                  "uri": "ws-workshop.",
+                  "uri": "workshop.",
                   "match": "prefix",
                   "allow": {
                     "register": true
@@ -28,7 +28,7 @@
               "name": "type-a",
               "permissions": [
                 {
-                  "uri": "ws-workshop.",
+                  "uri": "workshop.",
                   "match": "prefix",
                   "allow": {
                     "call": false,
@@ -45,7 +45,7 @@
             },
             {
               "name": "type-b",
-              "authorizer": "ws-workshop.permissions",
+              "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,
                 "publisher": true
@@ -53,7 +53,7 @@
             },
             {
               "name": "type-c",
-              "authorizer": "ws-workshop.permissions",
+              "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,
                 "publisher": true
@@ -141,7 +141,7 @@
               "auth": {
                 "wampcra": {
                   "type": "dynamic",
-                  "authenticator": "ws-workshop.auth"
+                  "authenticator": "workshop.auth"
                 }
               }
             }

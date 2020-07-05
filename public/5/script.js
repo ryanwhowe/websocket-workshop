@@ -22,7 +22,7 @@ var wsWorkshop = (function (){
 		if (!thread){
 			throw "You must enter a thread name as first parameter";
 		}
-		const prefix = "ws-workshop.chat.";
+		const prefix = "workshop.chat.";
 		if (thread.indexOf(prefix)!==0){
 			thread = prefix+thread;
 		}
@@ -66,7 +66,7 @@ var wsWorkshop = (function (){
 			throw "You must enter a thread name to check users for";
 		}
 
-		session.call('ws-workshop.subscribers', [thread]).then(function (res){
+		session.call('workshop.subscribers', [thread]).then(function (res){
 			console.log('Procedure caller says: I got an answer to '+name+' which was: ', res);
 		}, function (){
 			console.log('Procedure caller says: Oh no, calling '+name+' went wrong. I got these arguments: ', arguments);

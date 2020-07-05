@@ -96,7 +96,7 @@ $app->post('/thread', function (Request $request, Response $response){
 
 	$threads_db->insert(['user' => $name, 'title' => $title, 'permalink' => $permalink]);
 
-	return $response->withJson(['uri' => "ws-workshop.chat.$permalink"]);
+	return $response->withJson(['uri' => "workshop.chat.$permalink"]);
 });
 
 /*

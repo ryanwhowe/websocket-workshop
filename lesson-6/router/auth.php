@@ -26,7 +26,7 @@ function token_from_user(string $name){
 }
 
 function register_auth(ClientSession $session){
-	$name = 'ws-workshop.auth';
+	$name = 'workshop.auth';
 	register($session, $name, function ($args){
 		$realm = array_shift($args);
 		$authid = array_shift($args);
@@ -64,7 +64,7 @@ function register_auth(ClientSession $session){
 }
 
 function register_permissions(ClientSession $session){
-	$name = 'ws-workshop.permissions';
+	$name = 'workshop.permissions';
 	register($session, $name, function ($args){
 		$details = array_shift($args);
 		$uri = array_shift($args);
@@ -78,10 +78,10 @@ function register_permissions(ClientSession $session){
 		}
 
 		if ($action==='call'){
-			return $uri==='ws-workshop.subscribers';
+			return $uri==='workshop.subscribers';
 		}
 
-		$thread = str_replace('ws-workshop.chat.', '', $uri);
+		$thread = str_replace('workshop.chat.', '', $uri);
 		if (!$thread){
 			terminal_log("No thread name found");
 

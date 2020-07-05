@@ -26,7 +26,7 @@ function token_from_user(string $name){
 }
 
 function register_auth(ClientSession $session){
-	$name = 'ws-workshop.auth';
+	$name = 'workshop.auth';
 	register($session, $name, function ($args){
 		$realm = array_shift($args);
 		$authid = array_shift($args);
@@ -58,7 +58,7 @@ function register_auth(ClientSession $session){
 }
 
 function register_permissions(ClientSession $session){
-	$name = 'ws-workshop.permissions';
+	$name = 'workshop.permissions';
 	register($session, $name, function ($args){
 		$details = array_shift($args);
 		$uri = array_shift($args);
@@ -66,11 +66,11 @@ function register_permissions(ClientSession $session){
 
 		terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
 
-		if ($action==='publish' && strpos($uri, "ws-workshop.chat")===0){
+		if ($action==='publish' && strpos($uri, "workshop.chat")===0){
 			return ['allow' => true, 'disclose' => true, 'cache' => true];
 		}
 
-		if ($action==='subscribe' && strpos($uri, "ws-workshop.chat")===0){
+		if ($action==='subscribe' && strpos($uri, "workshop.chat")===0){
 			return ['allow' => true, 'cache' => true];
 		}
 
