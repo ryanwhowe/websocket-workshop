@@ -6,7 +6,7 @@
       "type": "router",
       "realms": [
         {
-          "name": "yorkshire",
+          "name": "ws-workshop",
           "roles": [
             {
               "name": "guest",
@@ -25,10 +25,10 @@
           ]
         },
         {
-          "name": "lancashire",
+          "name": "somewhere-else",
           "roles": [
             {
-              "name": "workman",
+              "name": "see-things",
               "permissions": [
                 {
                   "uri": "*",
@@ -42,7 +42,7 @@
               ]
             },
             {
-              "name": "foreman",
+              "name": "do-things",
               "permissions": [
                 {
                   "uri": "*",
@@ -56,7 +56,7 @@
               ]
             },
             {
-              "name": "salesman",
+              "name": "cant-call",
               "permissions": [
                 {
                   "uri": "*",
@@ -70,7 +70,7 @@
               ]
             },
             {
-              "name": "customer",
+              "name": "standard",
               "permissions": [
                 {
                   "uri": "*",
@@ -107,19 +107,19 @@
                   "users": {
                     "barry": {
                       "secret": "notsosecret",
-                      "role": "workman"
+                      "role": "see-things"
                     },
                     "steve": {
                       "secret": "slightlymoresecret",
-                      "role": "foreman"
+                      "role": "do-things"
                     },
                     "alan": {
                       "secret": "definitelysecret",
-                      "role": "salesman"
+                      "role": "cant-call"
                     },
                     "arnold": {
                       "secret": "whatdoessecretevenmean",
-                      "role": "customer"
+                      "role": "standard"
                     }
                   }
                 }

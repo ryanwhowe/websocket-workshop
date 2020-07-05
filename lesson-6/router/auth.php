@@ -8,10 +8,10 @@ use Thruway\ClientSession;
  */
 function token_from_user(string $name){
 	switch ($name){
-		case 'edmund':
-			return ['langley', 'king'];
-		case 'edward':
-			return ['norwich', 'prince'];
+		case 'alice':
+			return ['changeme', 'type-a'];
+		case 'bob':
+			return ['password123', 'type-b'];
 	}
 
 	$url = "http://app_4/auth?".http_build_query(['name' => $name]);
@@ -19,14 +19,14 @@ function token_from_user(string $name){
 	$token = http_get($url);
 
 	if ($token){
-		return [$token, 'serf'];
+		return [$token, 'type-c'];
 	}
 
 	throw new Exception("No user found with name '$name'");
 }
 
 function register_auth(ClientSession $session){
-	$name = 'phpyork.auth';
+	$name = 'ws-workshop.auth';
 	register($session, $name, function ($args){
 		$realm = array_shift($args);
 		$authid = array_shift($args);
@@ -46,7 +46,7 @@ function register_auth(ClientSession $session){
 			terminal_log("Error: {$e->getMessage()}");
 
 			return [
-				'role' => 'banished',
+				'role' => 'blocked',
 				'secret' => '',
 				'disclose' => true,
 			];
@@ -64,7 +64,7 @@ function register_auth(ClientSession $session){
 }
 
 function register_permissions(ClientSession $session){
-	$name = 'phpyork.permissions';
+	$name = 'ws-workshop.permissions';
 	register($session, $name, function ($args){
 		$details = array_shift($args);
 		$uri = array_shift($args);
@@ -78,10 +78,10 @@ function register_permissions(ClientSession $session){
 		}
 
 		if ($action==='call'){
-			return $uri==='phpyork.subscribers';
+			return $uri==='ws-workshop.subscribers';
 		}
 
-		$thread = str_replace('phpyork.chat.', '', $uri);
+		$thread = str_replace('ws-workshop.chat.', '', $uri);
 		if (!$thread){
 			terminal_log("No thread name found");
 

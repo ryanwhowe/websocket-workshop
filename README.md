@@ -1,4 +1,4 @@
-# PHP Yorkshire 2019 - Real Time Workshop
+# Real TIme Workshop
 
 ## Session overview
 
@@ -150,14 +150,13 @@ In this section we will cover:
 
 For this exercise visit http://localhost:8081/2/
 
-The previous commands were verbose so they've been included in a helper object. This is PHP
-Yorkshire so you can call commands on the object using `alreet.pub()`, `alreet.sub()` etc.
+The previous commands were verbose so they've been included in a helper object. You can call commands on the object using `wsWorkshop.pub()`, `wsWorkshop.sub()` etc.
 
-We now also have the option to change the realm to which we are connected. Call `alreet.setRealm()`
-with a string argument and then `alreet.connectAgain()` to close the connection and connect again
+We now also have the option to change the realm to which we are connected. Call `wsWorkshop.setRealm()`
+with a string argument and then `wsWorkshop.connectAgain()` to close the connection and connect again
 with a new realm (or just modify the script in `public/2/script.js` and refresh the page.
 
-If you try this with anything other than "yorkshire" you'll get an error. Let's look at the
+If you try this with anything other than "ws-workshop" you'll get an error. Let's look at the
 Crossbar config in `lesson-2/router/.crossbar/config.json`
 
 _Our next bit will be on the screen_
@@ -169,10 +168,10 @@ set to "router"). We are going to add another realm to show how realms/users are
 
 ```
 {
-  "name": "lancashire",
+  "name": "somewhere-else",
   "roles": [
     {
-      "name": "workman",
+      "name": "see-things",
       "permissions": [
         {
           "uri": "*",
@@ -186,7 +185,7 @@ set to "router"). We are going to add another realm to show how realms/users are
       ]
     },
     {
-      "name": "foreman",
+      "name": "do-things",
       "permissions": [
         {
           "uri": "*",
@@ -213,11 +212,11 @@ as only one of each type of authenticator is allowed.
   "principals": {
     "barry": {
       "ticket": "notsosecret",
-      "role": "workman"
+      "role": "see-things"
     },
     "steve": {
       "ticket": "slightlymoresecret",
-      "role": "foreman"
+      "role": "do-things"
     }
   }
 }
@@ -230,8 +229,8 @@ our crossbar servers. The easiest way is to restart the whole docker compose set
 Now refresh the webpage and run the following code in the console.
 
 ```
-alreet.setConfig({
-  realm:'lancashire',
+wsWorkshop.setConfig({
+  realm:'somewhere-else',
   authmethods: ['ticket'],
   onchallenge: function(session, method, extra){
     return 'notsosecret';
@@ -257,8 +256,8 @@ We can secure this by making the following changes: ticket->wampcra, principals-
 * Within each entity (barry and steve) modify their `ticket` to `secret` - now these actually become secrets
 
 ```
-alreet.setConfig({
-  realm:'lancashire',
+wsWorkshop.setConfig({
+  realm:'somewhere-else',
   authmethods: ['wampcra'],
   onchallenge: function(session, method, extra){
     return autobahn.auth_cra.sign('slightlymoresecret', extra.challenge);
@@ -350,7 +349,7 @@ $on_challenge = function (ClientSession $session, $method, ChallengeMessage $msg
 };
    
 $connection = new Connection([
-    "realm" => 'lancashire',
+    "realm" => 'somewhere-else',
     "url" => 'ws://localhost:8003/ws',
     "authmethods" => ["wampcra"],
     "onChallenge" => $on_challenge,
@@ -400,7 +399,7 @@ $session->subscribe($topic, function ($args) use ($topic){
 Now once again restart the PHP container, check it's subscribed and head back to the browser.
 
 Visit `http://localhost:8081/3/` and open the console. The connection should already be established and
-there's some new helper functions so run `alreet.pub()` in the console. Check the PHP logs and you should
+there's some new helper functions so run `wsWorkshop.pub()` in the console. Check the PHP logs and you should
 see your message has been received by the PHP client.
 
 This conversation might be one-sided if we can only actively talk from one side. Let's make the bot respond. 
@@ -435,7 +434,7 @@ $session->register($name, function ($args){
 });
 ```
 
-On the browser console run `alreet.call()` and the answer to our fiendish maths problem should be
+On the browser console run `wsWorkshop.call()` and the answer to our fiendish maths problem should be
 returned to us by the bot.
 
 ## 4. Dynamic authentication with workers
@@ -464,7 +463,7 @@ service, but crossbar will act to keep the service running for us.
     "php",
     "../authenticator.php",
     "ws://127.0.0.1:9001",
-    "yorkshire",
+    "ws-workshop",
     "authenticator",
     "authenticator-kZ%3g@JR1oXb"
   ]
@@ -509,13 +508,13 @@ authenticating via WAMPCRA. So replace the whole of the existing `auth` object w
 "auth": {
     "wampcra": {
       "type": "dynamic",
-      "authenticator": "phpyork.auth"
+      "authenticator": "ws-workshop.auth"
     }
   }
 ```
 
-The worker will act just like a regular client and register a procedure, specified above as "phpyork.auth"
-This means the worker itself needs a role, which we can add now. We'll go back to the "yorkshire" realm
+The worker will act just like a regular client and register a procedure, specified above as "ws-workshop.auth"
+This means the worker itself needs a role, which we can add now. We'll go back to the "wsWorkshop" realm
 for this next step.
 
 ```
@@ -524,7 +523,7 @@ for this next step.
       "name": "authenticator",
       "permissions": [
         {
-          "uri": "phpyork.auth",
+          "uri": "ws-workshop.auth",
           "allow": {
             "register": true
           },
@@ -538,15 +537,15 @@ for this next step.
 ]
 ```
 
-We can delete the "guest" role from our yorkshire realm and instead add these (the role names
+We can delete the "guest" role from our ws-workshop realm and instead add these (the role names
 might make sense for British history buffs later...)
 
 ```
 {
-  "name": "king",
+  "name": "type-a",
   "permissions": [
     {
-      "uri": "phpyork.",
+      "uri": "ws-workshop.",
       "match": "prefix",
       "allow": {
         "call": false,
@@ -562,7 +561,7 @@ might make sense for British history buffs later...)
   ]
 },
 {
-  "name": "banished",
+  "name": "blocked",
   "permissions": []
 }
 ```
@@ -576,7 +575,7 @@ to restart the server and check the logs. If we visit `http://localhost:8081/4` 
 see that it's not possible to connect because no authenticator is yet subscribed:
 
 ```
-alreet.setAuth('whatever', 'wont-work').connect()
+wsWorkshop.setAuth('whatever', 'wont-work').connect()
 ```
 
 Let's build an authenticator in PHP. Firstly we need to grab the arguments we passed to
@@ -617,10 +616,10 @@ Now we have the basic client similar to lesson 3. Inside the connection we can r
 that matches the name we supplied in the authentication config:
 
 ```
-$name = 'phpyork.auth';
+$name = 'ws-workshop.auth';
 $session->register($name, function (){
     return [
-        'role' => 'king',
+        'role' => 'type-a',
         'secret' => 'abc',
     ];
 })->then(function () use ($name){
@@ -631,7 +630,7 @@ $session->register($name, function (){
 Now we can try connecting with any user name and the secret "abc". Restart with `bin/run-crossbar 4`:
 
 ```
-alreet.setAuth('whatever', 'abc').connect()
+wsWorkshop.setAuth('whatever', 'abc').connect()
 ```
 
 We should now be connected to the server, but that wasn't very dynamic. We can do more with this by
@@ -655,8 +654,8 @@ we can then use this to supply authentication info:
 ```
 function token_from_user(string $name){
 	switch ($name){
-		case 'edmund':
-			return ['langley', 'king'];
+		case 'alice':
+			return ['changeme', 'type-a'];
 	}
 
 	throw new Exception("No user found with name '$name'");
@@ -673,7 +672,7 @@ catch (Exception $e) {
     terminal_log("Error: {$e->getMessage()}");
 
     return [
-        'role' => 'banished',
+        'role' => 'blocked',
         'secret' => '',
         'disclose' => true,
     ];
@@ -690,10 +689,10 @@ return [
 Once more we can restart ('bin/run-crossbar 4`) and then in the browser run:
 
 ```
-alreet.setAuth('edmund', 'langley').connect()
+wsWorkshop.setAuth('alice', 'changeme').connect()
 ```
 
-We now find we're connected as Edmund of Langley, first king of the house of York.
+We now find we're connected as the eponymous Alice, user of great renown.
 
 ### Lesson 4 Practical - Handling granular permissions
 
@@ -704,7 +703,7 @@ a procedure to determine user permissions.
 This first requires a modification of the `config.json` file again. Rather than adding a new
 permission to our authenticator role we can just widen the scope a little. Change:
 
-`"uri": "phpyork.auth"` to `"uri": "phpyork."` and then on the line below add a new field:
+`"uri": "ws-workshop.auth"` to `"uri": "ws-workshop."` and then on the line below add a new field:
 
 ```
 "match": "prefix",
@@ -712,12 +711,12 @@ permission to our authenticator role we can just widen the scope a little. Chang
 
 This allows the authenticator to register any procedure in the namespace, which will be useful later
 
-Then following the "king" role we can add another role:
+Then following the "type-a" role we can add another role:
 
 ```
 {
-  "name": "prince",
-  "authorizer": "phpyork.permissions",
+  "name": "type-b",
+  "authorizer": "ws-workshop.permissions",
   "disclose": {
     "caller": true,
     "publisher": true
@@ -726,12 +725,12 @@ Then following the "king" role we can add another role:
 ```
 
 Where you can see we once again declare an RPC URI but this time as a new key `authorizer`.
-In order to handle the prince role we want to add Edmund's son, Edward of Norwich, to our users
+In order to handle the type-b role we want to add another user, Bob, to our users
 function (inside the `switch` statement):
 
 ```
-case 'edward':
-    return ['norwich', 'prince'];
+case 'bob':
+    return ['password123', 'type-b'];
 ```
 
 Now inside the on connection function of the authenticator script we can add another register
@@ -739,7 +738,7 @@ prodecure step, this time for permissions. Rather than build it bit by bit we're
 in the whole block and can then talk about it more
 
 ```
-$name = 'phpyork.permissions';
+$name = 'ws-workshop.permissions';
 $session->register($name, function ($args){
     $details = array_shift($args);
     $uri = array_shift($args);
@@ -747,11 +746,11 @@ $session->register($name, function ($args){
 
     terminal_log("User {$details->authid} ({$details->session}) wants to $action on endpoint: $uri");
 
-    if ($action==='publish' && strpos($uri, "phpyork.chat")===0){
+    if ($action==='publish' && strpos($uri, "ws-workshop.chat")===0){
         return ['allow' => true, 'disclose' => true, 'cache' => true];
     }
 
-    if ($action==='subscribe' && strpos($uri, "phpyork.chat")===0){
+    if ($action==='subscribe' && strpos($uri, "ws-workshop.chat")===0){
         return ['allow' => true, 'cache' => true];
     }
 
@@ -764,15 +763,15 @@ $session->register($name, function ($args){
 Now, after restarting with `bin/run-crossbar 4`, we can go to the browser and try out our new role:
 
 ```
-alreet.setAuth('edward', 'norwich').connect()
-alreet.sub()
+wsWorkshop.setAuth('bob', 'password123').connect()
+wsWorkshop.sub()
 ```
 
 The role should connect but then be unable to subscribe to our default "test" topic. However if
 we follow the rules we've set for ourselves in the above permissions procedure and do:
 
 ```
-alreet.sub(null, 'phpyork.chat')
+wsWorkshop.sub(null, 'ws-workshop.chat')
 ```
 
 Then it will work for us correctly.
@@ -785,7 +784,7 @@ using the Slim framework which can be seen in `lesson-4/app/index.php`
 
 The app has the following endpoints set up:
 
-* `curl http://localhost:8014/lesson-4/yorkshire` will print a test output to check the container works
+* `curl http://localhost:8014/lesson-4/whatever` will print a test output to check the container works
 * `curl -X POST -d '{"name": "my user"}' -H 'content-type: application/json' localhost:8014/user`
    will add a new user with the specified name (names must be unique) and output both a password
    and a token. 
@@ -793,13 +792,13 @@ The app has the following endpoints set up:
 In the browser now we can call the method `login(user, password)` with our chosen username and the password
 from above. However that's not much use unless our authenticator can also talk to the app.
    
-The yorkshire realm in `config.json` will need another new role so we can split the app from hardcoded
+The ws-workshop realm in `config.json` will need another new role so we can split the app from hardcoded
 roles if needed later.
 
 ```
 {
-  "name": "serf",
-  "authorizer": "phpyork.permissions",
+  "name": "type-c",
+  "authorizer": "ws-workshop.permissions",
   "disclose": {
     "caller": true,
     "publisher": true
@@ -816,7 +815,7 @@ $token = http_get($url);
 $token = trim($token);
 
 if ($token){
-    return [$token, 'serf'];
+    return [$token, 'type-c'];
 }
 ```
 
@@ -827,7 +826,7 @@ you can also see the token which has been returned. Now your user has a shared s
 service without disclosing their password to the WAMP router or their token having to go across
 a websocket connection (and ignore the fact the local connection is HTTP - the issues of localhost!)
 
-Run `alreet.connect()` and you should see yourself signed in as a lowly serf who, because of lazy permission
+Run `wsWorkshop.connect()` and you should see yourself signed in as a lowly serf who, because of lazy permission
 programming on my part, has all the same permissions as a prince. Obviously given the above code you'd now
 be able to change this and rightfully restore royal privilege.
 
@@ -865,7 +864,7 @@ if (in_array($action, ['call', 'register'])){
     return false;
 }
 
-$thread = str_replace('phpyork.chat.', '', $uri);
+$thread = str_replace('ws-workshop.chat.', '', $uri);
 if (!$thread){
     terminal_log("No thread name found");
     return false;
@@ -890,8 +889,8 @@ can be carried out in the browser as follows:
 
 ```
 login(user, password)
-const thread = 'phpyork.chat.some-thread'
-alreet.connect().sub(thread).pub(thread, 'Hello to you');
+const thread = 'ws-workshop.chat.some-thread'
+wsWorkshop.connect().sub(thread).pub(thread, 'Hello to you');
 ```
 
 ### Lesson 5 Practical - Recording messages to our app
@@ -947,7 +946,7 @@ And again we need permission to do this:
 
 ```
 {
-  "uri": "phpyork.chat.",
+  "uri": "ws-workshop.chat.",
   "match": "prefix",
   "allow": {
     "subscribe": true
@@ -962,7 +961,7 @@ call to our application with the user's message, saving it to a database. Add th
 in our "listening" subscription:
 
 ```
-$thread = str_replace('phpyork.chat.', '', $topic);
+$thread = str_replace('ws-workshop.chat.', '', $topic);
 
 $url = "http://app_5/message";
 try {
@@ -1051,15 +1050,15 @@ this stage and let any user call it, rather than restricting to thread access. T
 will need to register this procedure:
 
 ```
-register($session, 'phpyork.subscribers', function($args){
+register($session, 'ws-workshop.subscribers', function($args){
     $topic = $args[0];
     if (!$topic){
         terminal_log("No topic supplied to check users");
         return '[]';
     }
 
-    if (strpos($topic, "phpyork.chat.")!==0){
-        $topic = "phpyork.chat.$topic";
+    if (strpos($topic, "ws-workshop.chat.")!==0){
+        $topic = "ws-workshop.chat.$topic";
     }
 
     $users = redis_get($topic);
@@ -1087,7 +1086,7 @@ if ($action==='register'){
 }
 
 if ($action==='call'){
-    return $uri==='phpyork.subscribers';
+    return $uri==='ws-workshop.subscribers';
 }
 ```
 
@@ -1095,7 +1094,7 @@ We can now call this in a browser. Try connecting, subscribing to a topic (make 
 successful) and then run this in the browser console:
 
 ```
-alreet.call('some-thread')
+wsWorkshop.call('some-thread')
 ```
 
 If it works the output should be a JSON encoded list of user names. To debug the Redis store
@@ -1327,7 +1326,7 @@ Firstly near the bottom of `lesson-6/router/.crossbar/config.json` we add anothe
     "php",
     "../broadcaster.php",
     "ws://127.0.0.1:9001",
-    "yorkshire",
+    "ws-workshop",
     "broadcaster",
     "broadcaster-0shVV4XQ#Fm#"
   ]
@@ -1343,7 +1342,7 @@ As with the authenticator we add a WAMPCRA key with the user name, static secret
 }
 ```
 
-Above in the "yorkshire" realm we can add the new role as well. We haven't got to publishing
+Above in the "ws-workshop" realm we can add the new role as well. We haven't got to publishing
 just yet but to save time later this role has publish permission to a named topic already.
 
 ```
@@ -1351,7 +1350,7 @@ just yet but to save time later this role has publish permission to a named topi
   "name": "broadcaster",
   "permissions": [
     {
-      "uri": "phpyork.broadcast",
+      "uri": "ws-workshop.broadcast",
       "allow": {
         "publish": true
       },
@@ -1397,16 +1396,16 @@ being well we should see the message appear in the logs of our crossbar containe
 Once we have the message received the next part is simple - publish it out to a topic:
 
 ```
-$session->publish('phpyork.broadcast', [$message]);
+$session->publish('ws-workshop.broadcast', [$message]);
 ```
 
 We're now able to broadcast and with just a few small changes our users can receive them as well.
 Firstly assuming we're still testing with users who gain their permisisons from `register_permissions()`
 in `lesson-6/router/auth.php` we can add the following at line 83 (just below where we allow them
-to call "phpyork.subscribers" from lesson 5):
+to call "ws-workshop.subscribers" from lesson 5):
 
 ```
-if ($action==='subscribe' && $uri==='phpyork.broadcast'){
+if ($action==='subscribe' && $uri==='ws-workshop.broadcast'){
     return true;
 }
 ```
@@ -1417,10 +1416,10 @@ line 126) so that users always get our broadcasts no matter what else they are d
 
 ```
 console.log("Will auto-subscribe to broadcast messages");
-sub('phpyork.broadcast');
+sub('ws-workshop.broadcast');
 ```
 
-Now run `alreet.connect()` to create the subscription (it will show in the console log) and then
+Now run `wsWorkshop.connect()` to create the subscription (it will show in the console log) and then
 execute the cURL command above to send the message to be published - if everything works this should
 show up in the user's browser console.
 

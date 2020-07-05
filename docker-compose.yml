@@ -14,7 +14,7 @@ services:
       - TZ=Europe/London
   crossbar_1:
     build: docker/crossbar
-    image: phpyorkshire/crossbar
+    image: websocket-workshop/crossbar
     ports:
       - "8001:8000"
     volumes:
@@ -23,7 +23,7 @@ services:
       - TZ=Europe/London
   crossbar_2:
     build: docker/crossbar
-    image: phpyorkshire/crossbar
+    image: websocket-workshop/crossbar
     ports:
       - "8002:8000"
     volumes:
@@ -32,7 +32,7 @@ services:
       - TZ=Europe/London
   crossbar_3:
     build: docker/crossbar
-    image: phpyorkshire/crossbar
+    image: websocket-workshop/crossbar
     ports:
       - "8003:8000"
     volumes:
@@ -41,7 +41,7 @@ services:
       - TZ=Europe/London
   crossbar_4:
     build: docker/crossbar-php
-    image: phpyorkshire/crossbar-php
+    image: websocket-workshop/crossbar-php
     ports:
       - "8004:8000"
     volumes:
@@ -50,7 +50,7 @@ services:
       - TZ=Europe/London
   crossbar_5:
     build: docker/crossbar-php
-    image: phpyorkshire/crossbar-php
+    image: websocket-workshop/crossbar-php
     ports:
       - "8005:8000"
     volumes:
@@ -59,7 +59,7 @@ services:
       - TZ=Europe/London
   crossbar_6:
     build: docker/crossbar-php
-    image: phpyorkshire/crossbar-php
+    image: websocket-workshop/crossbar-php
     ports:
       - "8006:8000"
     volumes:
@@ -70,7 +70,7 @@ services:
       - ./docker/zmq.env
   crossbar_7:
     build: docker/crossbar
-    image: phpyorkshire/crossbar
+    image: websocket-workshop/crossbar
     ports:
       - "8007:8000"
     volumes:
@@ -95,7 +95,7 @@ services:
       - TZ=Europe/London
   php_3:
     build: docker/php-client
-    image: phpyorkshire/php
+    image: websocket-workshop/php
     volumes:
       - ./lesson-3/php:/app
     network_mode: "host"
@@ -104,7 +104,7 @@ services:
     command: php /app/client.php
   app_4:
     build: docker/php-app
-    image: phpyorkshire/php-app
+    image: websocket-workshop/php-app
     ports:
       - "8014:80"
     volumes:
@@ -115,7 +115,7 @@ services:
     command: php -S 0.0.0.0:80 -t /app/
   app_5:
     build: docker/php-app
-    image: phpyorkshire/php-app
+    image: websocket-workshop/php-app
     ports:
       - "8015:80"
     volumes:
@@ -126,7 +126,7 @@ services:
     command: php -S 0.0.0.0:80 -t /app/
   app_6:
     build: docker/php-app
-    image: phpyorkshire/php-app
+    image: websocket-workshop/php-app
     ports:
       - "8016:80"
     volumes:
@@ -140,7 +140,7 @@ services:
     command: php -S 0.0.0.0:80 -t /app/
   zmq_6:
     build: docker/php-zmq
-    image: phpyorkshire/php-zmq
+    image: websocket-workshop/php-zmq
     volumes:
       - ./lesson-6/zmq:/app
       - ./db:/db

@@ -6,13 +6,13 @@
       "type": "router",
       "realms": [
         {
-          "name": "yorkshire",
+          "name": "ws-workshop",
           "roles": [
             {
               "name": "authenticator",
               "permissions": [
                 {
-                  "uri": "phpyork.",
+                  "uri": "ws-workshop.",
                   "match": "prefix",
                   "allow": {
                     "register": true
@@ -32,7 +32,7 @@
                   "cache": true
                 },
                 {
-                  "uri": "phpyork.chat.",
+                  "uri": "ws-workshop.chat.",
                   "match": "prefix",
                   "allow": {
                     "subscribe": true
@@ -42,10 +42,10 @@
               ]
             },
             {
-              "name": "king",
+              "name": "type-a",
               "permissions": [
                 {
-                  "uri": "phpyork.",
+                  "uri": "ws-workshop.",
                   "match": "prefix",
                   "allow": {
                     "call": false,
@@ -61,32 +61,32 @@
               ]
             },
             {
-              "name": "prince",
-              "authorizer": "phpyork.permissions",
+              "name": "type-b",
+              "authorizer": "ws-workshop.permissions",
               "disclose": {
                 "caller": true,
                 "publisher": true
               }
             },
             {
-              "name": "serf",
-              "authorizer": "phpyork.permissions",
+              "name": "type-c",
+              "authorizer": "ws-workshop.permissions",
               "disclose": {
                 "caller": true,
                 "publisher": true
               }
             },
             {
-              "name": "banished",
+              "name": "blocked",
               "permissions": []
             }
           ]
         },
         {
-          "name": "lancashire",
+          "name": "somewhere-else",
           "roles": [
             {
-              "name": "workman",
+              "name": "see-things",
               "permissions": [
                 {
                   "uri": "*",
@@ -100,7 +100,7 @@
               ]
             },
             {
-              "name": "foreman",
+              "name": "do-things",
               "permissions": [
                 {
                   "uri": "*",
@@ -114,7 +114,7 @@
               ]
             },
             {
-              "name": "salesman",
+              "name": "cant-call",
               "permissions": [
                 {
                   "uri": "*",
@@ -128,7 +128,7 @@
               ]
             },
             {
-              "name": "customer",
+              "name": "standard",
               "permissions": [
                 {
                   "uri": "*",
@@ -158,7 +158,7 @@
               "auth": {
                 "wampcra": {
                   "type": "dynamic",
-                  "authenticator": "phpyork.auth"
+                  "authenticator": "ws-workshop.auth"
                 }
               }
             }
@@ -192,7 +192,7 @@
         "php",
         "../authenticator.php",
         "ws://127.0.0.1:9001",
-        "yorkshire",
+        "ws-workshop",
         "authenticator",
         "authenticator-kZ%3g@JR1oXb"
       ]

@@ -41,7 +41,7 @@ $container['sleek'] = function ($container){
 };
 
 /* This route is just to test the web server works
- *  Hit it from a browser or with `curl http://localhost:8014/lesson-4/yorkshire`
+ *  Hit it from a browser or with `curl http://localhost:8014/lesson-4/whatever`
  */
 $app->get('/lesson-4/{name}', function (Request $request, Response $response, $args){
 	return $response->getBody()->write("Hello, ".$args['name']."\n");
@@ -96,7 +96,7 @@ $app->post('/login', function (Request $request, Response $response, $args){
 		return $response->withStatus(404)->withJson(['error' => "The user with name '$name' does not exist"]);
 	}
 
-	if ($password!=$users[0]['password']){
+	if ($password!==$users[0]['password']){
 		return $response->withStatus(403)->withJson(['error' => "Wrong password"]);
 	}
 

@@ -6,7 +6,7 @@ console.log("Hi, welcome to the tutorial (lesson 1). We're not going to get bogg
 var url = "ws://localhost:8001/ws";
 var connection = new autobahn.Connection({
 	url: url,
-	realm: "yorkshire"
+	realm: "ws-workshop"
 });
 
 var session;

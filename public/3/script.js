@@ -1,11 +1,11 @@
 console.log("Welcome to lesson 3");
 
-var alreet = (function (){
+var wsWorkshop = (function (){
 	var session, connection;
 	const url = "ws://localhost:8003/ws";
 
 	var config = {
-		realm: 'lancashire',
+		realm: 'somewhere-else',
 		authmethods: ['wampcra'],
 		onchallenge: function(session, method, extra){
 			return autobahn.auth_cra.sign('whatdoessecretevenmean', extra.challenge);
@@ -123,7 +123,7 @@ var alreet = (function (){
 
 		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
-			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
+			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'wsWorkshop' object to continue");
 
 			if (typeof callback==='function'){
 				callback(openedSession, details);
@@ -163,6 +163,6 @@ var alreet = (function (){
 	return singleton;
 })();
 
-alreet.connect(false, function(){
-	alreet.sub();
+wsWorkshop.connect(false, function(){
+	wsWorkshop.sub();
 });

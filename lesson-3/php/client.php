@@ -15,7 +15,7 @@ terminal_log("Hello. This is an example script");
 /*
  * We can remove this bit - if we don't have this here the script exits
  * as soon as it hits the end, but we want to do the loop in a more
- * managable format using React PHP
+ * manageable format using React PHP
  */
 $n = 1;
 $wait = 5;

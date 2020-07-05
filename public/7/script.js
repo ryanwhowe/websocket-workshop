@@ -8,7 +8,7 @@ var wampConnection = function(url, callback){
 	function connect(url, callback){
 		const config = {
 			url: url,
-			realm: 'yorkshire',
+			realm: 'ws-workshop',
 			max_retries: 0
 		};
 

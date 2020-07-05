@@ -1,12 +1,12 @@
 console.log("Welcome to lesson 5");
 
-var alreet = (function (){
+var wsWorkshop = (function (){
 	var session, connection;
 	const url = "ws://localhost:8005/ws";
 
 	var token;
 	const config = {
-		realm: 'yorkshire',
+		realm: 'ws-workshop',
 		authmethods: ['wampcra'],
 		onchallenge: function (session, method, extra){
 			return autobahn.auth_cra.sign(token, extra.challenge);
@@ -22,7 +22,7 @@ var alreet = (function (){
 		if (!thread){
 			throw "You must enter a thread name as first parameter";
 		}
-		const prefix = "phpyork.chat.";
+		const prefix = "ws-workshop.chat.";
 		if (thread.indexOf(prefix)!==0){
 			thread = prefix+thread;
 		}
@@ -66,7 +66,7 @@ var alreet = (function (){
 			throw "You must enter a thread name to check users for";
 		}
 
-		session.call('phpyork.subscribers', [thread]).then(function (res){
+		session.call('ws-workshop.subscribers', [thread]).then(function (res){
 			console.log('Procedure caller says: I got an answer to '+name+' which was: ', res);
 		}, function (){
 			console.log('Procedure caller says: Oh no, calling '+name+' went wrong. I got these arguments: ', arguments);
@@ -127,7 +127,7 @@ var alreet = (function (){
 
 		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
-			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
+			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'wsWorkshop' object to continue");
 
 			if (typeof callback==='function'){
 				callback(openedSession, details);
@@ -184,7 +184,7 @@ function login(user, password){
 	fetch(url, options).then(function(response) {
 		console.log('Login successful, setting token on websocket');
 		response.json().then(function(data){
-			alreet.setAuth(user, data.token);
+			wsWorkshop.setAuth(user, data.token);
 		});
 	}).catch(function(error){
 		console.error('Login error:', error);
@@ -192,5 +192,5 @@ function login(user, password){
 }
 
 console.log("We will start by logging in using a user and password created from the App in lesson 4.\n" +
-	"Use the 'login(user, password)' method, or if you know the token run alreet.setAuth(user, token)\n" +
-	"Either way once done run alreet.connect()");
+	"Use the 'login(user, password)' method, or if you know the token run wsWorkshop.setAuth(user, token)\n" +
+	"Either way once done run wsWorkshop.connect()");

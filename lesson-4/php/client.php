@@ -41,7 +41,7 @@ $onChallenge = function (ClientSession $session, $method, ChallengeMessage $msg)
 };
 
 $connection = new Connection([
-	"realm" => 'lancashire',
+	"realm" => 'somewhere-else',
 	"url" => 'ws://localhost:8003/ws',
 	"authmethods" => ["wampcra"],
 	"onChallenge" => $onChallenge,

@@ -10,7 +10,7 @@ COPY . .
 
 COPY --from=composertemp /app/vendor/ vendor/
 
-LABEL name="phpyorkshire/crossbar-php"
+LABEL name="websocket-workshop/crossbar-php"
 
 # We need python as well so lets merge the python 3-slim image
 COPY --from=python:3-slim / /

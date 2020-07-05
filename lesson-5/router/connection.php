@@ -8,7 +8,6 @@ use Thruway\Message\ChallengeMessage;
 /**
  * @param array $cmd_args
  * @param callable $on_open
- * @return Connection
  */
 function start_connection(array $cmd_args, callable $on_open){
 	list ($url, $realm, $user, $password) = array_slice($cmd_args, 1);

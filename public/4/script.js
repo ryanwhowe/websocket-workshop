@@ -1,12 +1,12 @@
 console.log("Welcome to lesson 4");
 
-var alreet = (function (){
+var wsWorkshop = (function (){
 	var session, connection;
 	const url = "ws://localhost:8004/ws";
 
 	var token;
 	const config = {
-		realm: 'yorkshire',
+		realm: 'ws-workshop',
 		authmethods: ['wampcra'],
 		onchallenge: function (session, method, extra){
 			return autobahn.auth_cra.sign(token, extra.challenge);
@@ -101,7 +101,7 @@ var alreet = (function (){
 
 		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
-			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
+			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'wsWorkshop' object to continue");
 
 			if (typeof callback==='function'){
 				callback(openedSession, details);
@@ -156,11 +156,11 @@ function login(user, password){
 	fetch(url, options).then(function(response) {
 		console.log('Login successful, setting token on websocket');
 		response.json().then(function(data){
-			alreet.setAuth(user, data.token);
+			wsWorkshop.setAuth(user, data.token);
 		});
 	}).catch(function(error){
 		console.error('Login error:', error);
 	});
 }
 
-console.log("This time we're not opening the connection automatically; run `alreet.setAuth(user, token).connect()` to try connecting");
+console.log("This time we're not opening the connection automatically; run `wsWorkshop.setAuth(user, token).connect()` to try connecting");

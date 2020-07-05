@@ -22,7 +22,7 @@ $config = [
 $app = new App($config);
 
 /* This route is just to test the web server works
- *  Hit it from a browser or with `curl http://localhost:8016/lesson-6/yorkshire`
+ *  Hit it from a browser or with `curl http://localhost:8016/lesson-6/whatever`
  */
 $app->get('/lesson-6/{name}', function (Request $request, Response $response, $args){
 	return $response->getBody()->write("Hello, ".$args['name']."\n");

@@ -45,7 +45,7 @@ $container['sleek'] = function ($container){
 };
 
 /* This route is just to test the web server works
- *  Hit it from a browser or with `curl http://localhost:8015/lesson-5/yorkshire`
+ *  Hit it from a browser or with `curl http://localhost:8015/lesson-5/whatveer`
  */
 $app->get('/lesson-5/{name}', function (Request $request, Response $response, $args){
 	return $response->getBody()->write("Hello, ".$args['name']."\n");
@@ -96,7 +96,7 @@ $app->post('/thread', function (Request $request, Response $response){
 
 	$threads_db->insert(['user' => $name, 'title' => $title, 'permalink' => $permalink]);
 
-	return $response->withJson(['uri' => "phpyork.chat.$permalink"]);
+	return $response->withJson(['uri' => "ws-workshop.chat.$permalink"]);
 });
 
 /*

@@ -1,7 +1,7 @@
 # Start with a base image
 FROM python:3-slim
 
-LABEL name="phpyorkshire/crossbar"
+LABEL name="websocket-workshop/crossbar"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

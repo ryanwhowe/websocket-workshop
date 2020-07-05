@@ -1,11 +1,11 @@
 console.log("Welcome to lesson 2");
 
-var alreet = (function (){
+var wsWorkshop = (function (){
 	var session, connection;
 	const url = "ws://localhost:8002/ws";
 
 	var config = {
-		realm: 'yorkshire',
+		realm: 'ws-workshop',
 		authmethods: ['anonymous']
 	};
 
@@ -115,7 +115,7 @@ var alreet = (function (){
 
 		connection.onopen = function (openedSession, details){
 			setSession(openedSession);
-			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'alreet' object to continue");
+			console.log("Websocket connection open to realm "+realm+" as role: '"+details.authrole+"'. Call methods on the 'wsWorkshop' object to continue");
 		};
 
 		connection.onclose = function (reason, details){
@@ -146,4 +146,4 @@ var alreet = (function (){
 	return singleton;
 })();
 
-alreet.connect();
+wsWorkshop.connect();
