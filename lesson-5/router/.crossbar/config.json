@@ -25,7 +25,7 @@
               ]
             },
             {
-              "name": "type-a",
+              "name": "type1",
               "permissions": [
                 {
                   "uri": "workshop.",
@@ -44,7 +44,7 @@
               ]
             },
             {
-              "name": "type-b",
+              "name": "type2",
               "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,
@@ -52,7 +52,7 @@
               }
             },
             {
-              "name": "type-c",
+              "name": "type3",
               "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,
@@ -69,7 +69,7 @@
           "name": "somewhere-else",
           "roles": [
             {
-              "name": "see-things",
+              "name": "seethings",
               "permissions": [
                 {
                   "uri": "*",
@@ -83,7 +83,7 @@
               ]
             },
             {
-              "name": "do-things",
+              "name": "dothings",
               "permissions": [
                 {
                   "uri": "*",
@@ -97,7 +97,7 @@
               ]
             },
             {
-              "name": "cant-call",
+              "name": "cantcall",
               "permissions": [
                 {
                   "uri": "*",

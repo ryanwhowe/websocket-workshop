@@ -171,7 +171,7 @@ set to "router"). We are going to add another realm to show how realms/users are
   "name": "somewhere-else",
   "roles": [
     {
-      "name": "see-things",
+      "name": "seethings",
       "permissions": [
         {
           "uri": "*",
@@ -185,7 +185,7 @@ set to "router"). We are going to add another realm to show how realms/users are
       ]
     },
     {
-      "name": "do-things",
+      "name": "dothings",
       "permissions": [
         {
           "uri": "*",
@@ -212,11 +212,11 @@ as only one of each type of authenticator is allowed.
   "principals": {
     "barry": {
       "ticket": "notsosecret",
-      "role": "see-things"
+      "role": "seethings"
     },
     "steve": {
       "ticket": "slightlymoresecret",
-      "role": "do-things"
+      "role": "dothings"
     }
   }
 }
@@ -542,7 +542,7 @@ might make sense for British history buffs later...)
 
 ```
 {
-  "name": "type-a",
+  "name": "type1",
   "permissions": [
     {
       "uri": "workshop.",
@@ -619,7 +619,7 @@ that matches the name we supplied in the authentication config:
 $name = 'workshop.auth';
 $session->register($name, function (){
     return [
-        'role' => 'type-a',
+        'role' => 'type1',
         'secret' => 'abc',
     ];
 })->then(function () use ($name){
@@ -655,7 +655,7 @@ we can then use this to supply authentication info:
 function token_from_user(string $name){
 	switch ($name){
 		case 'alice':
-			return ['changeme', 'type-a'];
+			return ['changeme', 'type1'];
 	}
 
 	throw new Exception("No user found with name '$name'");
@@ -711,11 +711,11 @@ permission to our authenticator role we can just widen the scope a little. Chang
 
 This allows the authenticator to register any procedure in the namespace, which will be useful later
 
-Then following the "type-a" role we can add another role:
+Then following the "type1" role we can add another role:
 
 ```
 {
-  "name": "type-b",
+  "name": "type2",
   "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
@@ -725,12 +725,12 @@ Then following the "type-a" role we can add another role:
 ```
 
 Where you can see we once again declare an RPC URI but this time as a new key `authorizer`.
-In order to handle the type-b role we want to add another user, Bob, to our users
+In order to handle the type2 role we want to add another user, Bob, to our users
 function (inside the `switch` statement):
 
 ```
 case 'bob':
-    return ['password123', 'type-b'];
+    return ['password123', 'type2'];
 ```
 
 Now inside the on connection function of the authenticator script we can add another register
@@ -797,7 +797,7 @@ roles if needed later.
 
 ```
 {
-  "name": "type-c",
+  "name": "type3",
   "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
@@ -815,7 +815,7 @@ $token = http_get($url);
 $token = trim($token);
 
 if ($token){
-    return [$token, 'type-c'];
+    return [$token, 'type3'];
 }
 ```
 

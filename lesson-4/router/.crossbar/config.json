@@ -28,7 +28,7 @@
           "name": "somewhere-else",
           "roles": [
             {
-              "name": "see-things",
+              "name": "seethings",
               "permissions": [
                 {
                   "uri": "*",
@@ -42,7 +42,7 @@
               ]
             },
             {
-              "name": "do-things",
+              "name": "dothings",
               "permissions": [
                 {
                   "uri": "*",
@@ -56,7 +56,7 @@
               ]
             },
             {
-              "name": "cant-call",
+              "name": "cantcall",
               "permissions": [
                 {
                   "uri": "*",
@@ -107,15 +107,15 @@
                   "users": {
                     "barry": {
                       "secret": "notsosecret",
-                      "role": "see-things"
+                      "role": "seethings"
                     },
                     "steve": {
                       "secret": "slightlymoresecret",
-                      "role": "do-things"
+                      "role": "dothings"
                     },
                     "alan": {
                       "secret": "definitelysecret",
-                      "role": "cant-call"
+                      "role": "cantcall"
                     },
                     "arnold": {
                       "secret": "whatdoessecretevenmean",
