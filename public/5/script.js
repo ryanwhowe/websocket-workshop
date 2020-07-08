@@ -22,7 +22,7 @@ var wsWorkshop = (function (){
 		if (!thread){
 			throw "You must enter a thread name as first parameter";
 		}
-		const prefix = "workshop.chat.";
+		const prefix = "workshop.";
 		if (thread.indexOf(prefix)!==0){
 			thread = prefix+thread;
 		}
