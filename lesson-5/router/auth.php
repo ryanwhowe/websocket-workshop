@@ -36,7 +36,7 @@ function register_auth(ClientSession $session){
 		terminal_log("Received auth request for user '$authid' on realm '$realm'. Crossbar session was '$session_id'");
 
 		try {
-			list($token, $role) = token_from_user($authid);
+			[$token, $role] = token_from_user($authid);
 		}
 		catch (Exception $e) {
 			terminal_log("Error: {$e->getMessage()}");
