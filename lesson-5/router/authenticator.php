@@ -4,7 +4,6 @@
  * Have moved a few items into functions to keep stuff clean
  */
 
-use Thruway\CallResult;
 use Thruway\ClientSession;
 
 require __DIR__.'/../vendor/autoload.php';
@@ -12,6 +11,7 @@ require __DIR__.'/../vendor/autoload.php';
 require 'utilities.php';
 require 'connection.php';
 require 'auth.php';
+require 'storage.php';
 
 start_connection($argv, function (ClientSession $session, $transport, $details){
 	terminal_log("Connection opened with role '{$details->authrole}'");

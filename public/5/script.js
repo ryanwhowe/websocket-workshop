@@ -22,7 +22,7 @@ var wsWorkshop = (function (){
 		if (!thread){
 			throw "You must enter a thread name as first parameter";
 		}
-		const prefix = "workshop.";
+		const prefix = "workshop.chat.";
 		if (thread.indexOf(prefix)!==0){
 			thread = prefix+thread;
 		}
@@ -188,7 +188,7 @@ function login(user, password){
 				return;
 			}
 
-			console.log('Login successful, setting token on websocket');
+			console.log('Login successful, setting token on websocket', data.token);
 
 			wsWorkshop.setAuth(user, data.token);
 		});

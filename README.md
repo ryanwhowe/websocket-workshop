@@ -860,6 +860,7 @@ subscribe to a thread. This can be done with an HTTP call to our application sim
 In the `register_permissions` method replace the current logic (after the log line) with this:
 
 ```
+$user = $details->authid;
 if (in_array($action, ['call', 'register'])){
     return false;
 }

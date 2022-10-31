@@ -34,4 +34,8 @@ wait_file "$log_file" || {
 echo "Will now tail -f logs for crossbar on lesson $lesson, press Ctrl+c to exit"
 echo ""
 
-tail -f "$log_file"
+if [ -n "$1" ]; then
+  tail -f "$log_file" | grep --line-buffered "(Authenticator)"
+else
+  tail -f "$log_file"
+fi
