@@ -62,8 +62,6 @@ WORKDIR /app
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
-#ENTRYPOINT ["tail", "-f", "/dev/null"]
-
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["crossbar", "start" , "--logdir=/app/logs/", "--logtofile", "--loglevel=debug"]
