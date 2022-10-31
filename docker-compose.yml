@@ -70,29 +70,12 @@ services:
     env_file:
       - ./docker/zmq.env
     command: tail -f /dev/null
-  crossbar_7:
-    build: docker/crossbar
-    image: websocket-workshop/crossbar
-    ports:
-      - "8007:8000"
-    volumes:
-      - ./lesson-7/router:/app
-    environment:
-      - TZ=Europe/London
   http:
     image: httpd:2.4
     ports:
       - "8081:80"
     volumes:
       - ./public:/usr/local/apache2/htdocs/
-    environment:
-      - TZ=Europe/London
-  http_7:
-    image: httpd:2.4
-    ports:
-      - "8082:80"
-    volumes:
-      - ./lesson-7/webrtc:/usr/local/apache2/htdocs/
     environment:
       - TZ=Europe/London
   php_3:

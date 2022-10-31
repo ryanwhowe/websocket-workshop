@@ -1423,22 +1423,6 @@ Now run `wsWorkshop.connect()` to create the subscription (it will show in the c
 execute the cURL command above to send the message to be published - if everything works this should
 show up in the user's browser console.
 
-## 7. Experiments with WebRTC
-
-In this section we will cover:
-
-* Principles of WebRTC
-* Basic connection establishment
-* How websockets can be used to facilitate WebRTC connections
-* Tools & pitfalls for WebRTC development
-
-### Lesson 7 Practical - Serverless WebRTC
-
-Visit `http://localhost:8081/7/` in a browser. The instructions for how to continue are on that page.
-You will need to pair up, choose a character and follow the instructions to try and establish a 
-"serverless" WebRTC connection. In actual fact we are using a server because during the workshop it's
-hard to know how to accurately move a long and complex string between two devices!
-
 ## References
 
 There's a growing wealth of information online to help learn about real time web applications.
