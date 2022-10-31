@@ -1,15 +1,23 @@
 {
-    "name": "m1ke/websocket-workshop-client",
-    "type": "project",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "m1ke",
-            "email": "mike@m1ke.me"
-        }
-    ],
-    "require": {
-        "voryx/thruway": "^0.5.3",
-        "thruway/pawl-transport": "^0.5.0"
+  "name": "m1ke/websocket-workshop-client",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "m1ke",
+      "email": "mike@m1ke.me"
     }
+  ],
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  },
+  "require": {
+    "voryx/thruway": "^0.5.3",
+    "thruway/pawl-transport": "^0.5.0"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  }
 }

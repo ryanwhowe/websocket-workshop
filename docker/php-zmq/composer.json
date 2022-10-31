@@ -1,16 +1,24 @@
 {
-    "name": "m1ke/websocket-workshop-zmq",
-    "type": "project",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "m1ke",
-            "email": "mike@m1ke.me"
-        }
-    ],
-    "require": {
-        "rakibtg/sleekdb": "^1.0",
-        "monolog/monolog": "^1.24",
-        "react/zmq": "^0.4.0"
+  "name": "m1ke/websocket-workshop-zmq",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "m1ke",
+      "email": "mike@m1ke.me"
     }
+  ],
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  },
+  "require": {
+    "rakibtg/sleekdb": "^1.0",
+    "monolog/monolog": "^1.24",
+    "react/zmq": "^0.4.0"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  }
 }

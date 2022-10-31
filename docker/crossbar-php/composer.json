@@ -1,17 +1,25 @@
 {
-    "name": "m1ke/websocket-workshop-server",
-    "type": "project",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "m1ke",
-            "email": "mike@m1ke.me"
-        }
-    ],
-    "require": {
-        "voryx/thruway": "^0.5.3",
-        "thruway/pawl-transport": "^0.5.0",
-        "guzzlehttp/guzzle": "^6.3.3",
-        "react/zmq": "^0.4.0"
+  "name": "m1ke/websocket-workshop-server",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "m1ke",
+      "email": "mike@m1ke.me"
     }
+  ],
+  "config": {
+    "platform": {
+      "php": "7.4"
+    }
+  },
+  "require": {
+    "voryx/thruway": "^0.5.3",
+    "thruway/pawl-transport": "^0.5.0",
+    "guzzlehttp/guzzle": "^6.3.3",
+    "react/zmq": "^0.4.0"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  }
 }

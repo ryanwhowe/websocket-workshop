@@ -15,9 +15,9 @@
 
 * git
 * docker (17.05 or higher)
-* docker-compose (for convenience you might alias this to `dc` in your shell)
+* docker-compose (or `docker compose` for newer versions)
 * Firefox or Chromium (any derivative)
-* tail (seriously surprised if you're missing this)
+* `tail` command
 * IDE or similar (you'll be reading this README a lot so markdown highlighting will help!)
 
 _Pro-tip: I discovered long ago you can make it easy to add helper scripts to any environment

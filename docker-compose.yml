@@ -48,6 +48,7 @@ services:
       - ./lesson-4/router:/app
     environment:
       - TZ=Europe/London
+    command: tail -f /dev/null
   crossbar_5:
     build: docker/crossbar-php
     image: websocket-workshop/crossbar-php
@@ -68,6 +69,7 @@ services:
       - TZ=Europe/London
     env_file:
       - ./docker/zmq.env
+    command: tail -f /dev/null
   crossbar_7:
     build: docker/crossbar
     image: websocket-workshop/crossbar
@@ -148,4 +150,4 @@ services:
       - TZ=Europe/London
     env_file:
       - ./docker/zmq.env
-    command: php /app/zmq.php
+    command: tail -f /dev/null
