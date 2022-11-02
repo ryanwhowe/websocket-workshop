@@ -42,7 +42,7 @@
               ]
             },
             {
-              "name": "type1",
+              "name": "basic-user",
               "permissions": [
                 {
                   "uri": "workshop.",
@@ -61,7 +61,7 @@
               ]
             },
             {
-              "name": "type2",
+              "name": "permissions-user",
               "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,
@@ -69,7 +69,7 @@
               }
             },
             {
-              "name": "type3",
+              "name": "app-user",
               "authorizer": "workshop.permissions",
               "disclose": {
                 "caller": true,

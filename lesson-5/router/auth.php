@@ -9,9 +9,9 @@ use Thruway\ClientSession;
 function token_from_user(string $name){
 	switch ($name){
 		case 'alice':
-			return ['changeme', 'type1'];
+			return ['changeme', 'basic-user'];
 		case 'bob':
-			return ['password123', 'type2'];
+			return ['password123', 'permissions-user'];
 	}
 
 	$url = "http://app_4/auth?".http_build_query(['name' => $name]);
@@ -19,7 +19,7 @@ function token_from_user(string $name){
 	$token = http_get($url);
 
 	if ($token){
-		return [$token, 'type3'];
+		return [$token, 'app-user'];
 	}
 
 	throw new Exception("No user found with name '$name'");

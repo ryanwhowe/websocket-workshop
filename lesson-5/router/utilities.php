@@ -6,7 +6,7 @@ use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 
 function terminal_log(string $msg){
-	echo "(Authenticator) $msg";
+	echo "(Authenticator) $msg ";
 }
 
 function http_get(string $url){

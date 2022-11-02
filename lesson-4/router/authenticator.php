@@ -12,7 +12,7 @@ use Thruway\Message\ChallengeMessage;
 require __DIR__.'/../vendor/autoload.php';
 
 function terminal_log(string $msg){
-	echo "(Authenticator) $msg";
+	echo "(Authenticator) $msg ";
 }
 
 function http_get(string $url){
