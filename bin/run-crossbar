@@ -31,11 +31,13 @@ wait_file "$log_file" || {
   exit 1
 }
 
-echo "Will now tail -f logs for crossbar on lesson $lesson, press Ctrl+c to exit"
-echo ""
 
-if [ -n "$1" ]; then
+if [ -n "$2" ]; then
+  echo "Will now tail -f logs for the Authenticator on lesson $lesson, press Ctrl+c to exit"
+  echo ""
   tail -f "$log_file" | grep --line-buffered "(Authenticator)"
 else
+  echo "Will now tail -f logs for crossbar on lesson $lesson, press Ctrl+c to exit"
+  echo ""
   tail -f "$log_file"
 fi
