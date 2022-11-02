@@ -1,10 +1,10 @@
 console.log("Welcome to lesson 4");
 
-var wsWorkshop = (function (){
-	var session, connection;
+const wsWorkshop = (function (){
+	let session, connection;
 	const url = "ws://localhost:8004/ws";
 
-	var token;
+	let token;
 	const config = {
 		realm: 'ws-workshop',
 		authmethods: ['wampcra'],
@@ -141,12 +141,12 @@ var wsWorkshop = (function (){
 })();
 
 function login(user, password){
-	var url = 'http://localhost:8014/login';
+	const url = 'http://localhost:8014/login';
 
-	var headers = new Headers();
+	const headers = new Headers();
 	headers.append('Content-Type','application/json');
 
-	var options = {
+	const options = {
 		method: 'POST',
 		headers: headers,
 		cors: 'no-cors',

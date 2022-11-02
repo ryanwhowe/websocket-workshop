@@ -3,13 +3,13 @@ console.log("Hi, welcome to the tutorial (lesson 1). We're not going to get bogg
 	"see how to hook this into an application later. Our first script will create a connection\n" +
 	"object and then expose the session for us to play around with");
 
-var url = "ws://localhost:8001/ws";
-var connection = new autobahn.Connection({
+const url = "ws://localhost:8001/ws";
+const connection = new autobahn.Connection({
 	url: url,
 	realm: "ws-workshop"
 });
 
-var session;
+let session;
 
 connection.onopen = function (openedSession, details) {
 	console.log("The websocket connection is open. At this point we get two parameters passed\n" +

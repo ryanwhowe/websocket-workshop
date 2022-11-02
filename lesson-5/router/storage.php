@@ -4,16 +4,19 @@ define('REDIS_TTL', 3600);
 define('REDIS_URI', 'redis');
 
 /**
- * @return Redis
+ * @throws RedisException
  */
-function redis_connect(){
+function redis_connect(): Redis{
 	$redis = new Redis();
 	$redis->connect(REDIS_URI);
 
 	return $redis;
 }
 
-function redis_get(string $key){
+/**
+ * @throws RedisException
+ */
+function redis_get(string $key): ?string{
 	if (!$key){
 		return null;
 	}
@@ -25,7 +28,10 @@ function redis_get(string $key){
 	return trim($value);
 }
 
-function redis_set(string $key, $value){
+/**
+ * @throws RedisException
+ */
+function redis_set(string $key, $value) :void{
 	if (!$key){
 		return;
 	}
@@ -35,17 +41,25 @@ function redis_set(string $key, $value){
 	$redis->setEx($key, REDIS_TTL, $value);
 }
 
-function redis_set_array(string $key, array $arr){
+/**
+ * @throws RedisException
+ * @throws JsonException
+ */
+function redis_set_array(string $key, array $arr) :void{
 	if (!$key){
 		return;
 	}
 
 	$redis = redis_connect();
 
-	$redis->setEx($key, REDIS_TTL, json_encode($arr));
+	$redis->setEx($key, REDIS_TTL, json_encode($arr, JSON_THROW_ON_ERROR));
 }
 
-function redis_get_array(string $key){
+/**
+ * @throws RedisException
+ * @throws JsonException
+ */
+function redis_get_array(string $key) :?array{
 	if (!$key){
 		return null;
 	}
@@ -53,7 +67,7 @@ function redis_get_array(string $key){
 	$redis = redis_connect();
 
 	$list = $redis->get($key);
-	$list = json_decode($list);
+	$list = json_decode($list, false, 512, JSON_THROW_ON_ERROR);
 	if (!is_array($list)){
 		$list = [];
 	}
@@ -61,7 +75,11 @@ function redis_get_array(string $key){
 	return $list;
 }
 
-function redis_add_to_array(string $key, $value){
+/**
+ * @throws RedisException
+ * @throws JsonException
+ */
+function redis_add_to_array(string $key, $value) :?array{
 	if (!$key){
 		return null;
 	}
@@ -69,13 +87,13 @@ function redis_add_to_array(string $key, $value){
 	$redis = redis_connect();
 
 	$list = $redis->get($key);
-	$list = json_decode($list);
+	$list = json_decode($list, false, 512, JSON_THROW_ON_ERROR);
 	if (!is_array($list)){
 		$list = [];
 	}
 	$list[] = $value;
 
-	$redis->setEx($key, REDIS_TTL, json_encode($list));
+	$redis->setEx($key, REDIS_TTL, json_encode($list, JSON_THROW_ON_ERROR));
 
 	return $list;
 }

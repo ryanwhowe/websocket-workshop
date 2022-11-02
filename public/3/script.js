@@ -1,10 +1,10 @@
 console.log("Welcome to lesson 3");
 
-var wsWorkshop = (function (){
-	var session, connection;
+const wsWorkshop = (function (){
+	let session, connection;
 	const url = "ws://localhost:8003/ws";
 
-	var config = {
+	let config = {
 		realm: 'somewhere-else',
 		authmethods: ['wampcra'],
 		onchallenge: function(session, method, extra){
@@ -115,6 +115,7 @@ var wsWorkshop = (function (){
 			console.log("Already connected, use .connectAgain method to close and reconnect");
 			return;
 		}
+
 		const realm = config.realm;
 		const auth = config.authmethods;
 

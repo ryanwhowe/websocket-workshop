@@ -6,10 +6,13 @@ use Thruway\ClientSession;
 use Thruway\Logging\Logger;
 
 function terminal_log(string $msg){
-	echo "(".LOG_NAME.") $msg";
+	echo "(".LOG_NAME.") $msg ";
 }
 
-function http_get(string $url){
+/**
+ * @throws Exception
+ */
+function http_get(string $url) :string{
 	$client = new Client();
 
 	try {
@@ -25,7 +28,10 @@ function http_get(string $url){
 	return trim($text);
 }
 
-function http_post(string $url, array $data){
+/**
+ * @throws Exception
+ */
+function http_post(string $url, array $data): string{
 	$client = new Client();
 
 	try {

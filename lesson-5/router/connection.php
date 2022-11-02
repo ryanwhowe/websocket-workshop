@@ -8,9 +8,10 @@ use Thruway\Message\ChallengeMessage;
 /**
  * @param array $cmd_args
  * @param callable $on_open
+ * @throws Exception
  */
-function start_connection(array $cmd_args, callable $on_open){
-	list ($url, $realm, $user, $password) = array_slice($cmd_args, 1);
+function start_connection(array $cmd_args, callable $on_open) :void{
+	[$url, $realm, $user, $password] = array_slice($cmd_args, 1);
 
 	$on_challenge = function (ClientSession $session, $method, ChallengeMessage $msg) use ($user, $password){
 		if ("wampcra"!==$method){

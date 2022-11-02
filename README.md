@@ -662,7 +662,7 @@ to link with the internal crossbar logs. If we add a function to the global scop
 we can then use this to supply authentication info:
 
 ```
-function token_from_user(string $name){
+function token_from_user(string $name) :array{
 	switch ($name){
 		case 'alice':
 			return ['changeme', 'basic-user'];

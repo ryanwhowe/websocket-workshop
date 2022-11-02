@@ -2,11 +2,10 @@
 use Thruway\ClientSession;
 
 /**
- * @param string $name
- * @return array [string $token, string $role]
+ * @return array{string, string}
  * @throws Exception
  */
-function token_from_user(string $name){
+function token_from_user(string $name) :array{
 	switch ($name){
         case 'alice':
             return ['changeme', 'basic-user'];
@@ -27,7 +26,7 @@ function token_from_user(string $name){
 
 function register_auth(ClientSession $session){
 	$name = 'workshop.auth';
-	register($session, $name, function ($args){
+	register($session, $name, function (array $args){
 		$realm = array_shift($args);
 		$authid = array_shift($args);
 		$details = array_shift($args);
@@ -40,7 +39,7 @@ function register_auth(ClientSession $session){
 				throw new Exception('No auth ID was supplied in the connection attempt');
 			}
 
-			list($token, $role) = token_from_user($authid);
+			[$token, $role] = token_from_user($authid);
 		}
 		catch (Exception $e) {
 			terminal_log("Error: {$e->getMessage()}");
@@ -65,7 +64,7 @@ function register_auth(ClientSession $session){
 
 function register_permissions(ClientSession $session){
 	$name = 'workshop.permissions';
-	register($session, $name, function ($args){
+	register($session, $name, function (array $args){
 		$details = array_shift($args);
 		$uri = array_shift($args);
 		$action = array_shift($args);

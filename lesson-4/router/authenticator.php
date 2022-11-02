@@ -15,7 +15,10 @@ function terminal_log(string $msg){
 	echo "(Authenticator) $msg ";
 }
 
-function http_get(string $url){
+/**
+ * @throws Exception
+ */
+function http_get(string $url): string{
 	$client = new Client();
 
 	try {

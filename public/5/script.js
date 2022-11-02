@@ -1,10 +1,10 @@
 console.log("Welcome to lesson 5");
 
-var wsWorkshop = (function (){
-	var session, connection;
+const wsWorkshop = (function (){
+	let session, connection;
 	const url = "ws://localhost:8005/ws";
 
-	var token;
+	let token;
 	const config = {
 		realm: 'ws-workshop',
 		authmethods: ['wampcra'],
@@ -49,10 +49,9 @@ var wsWorkshop = (function (){
 	function sub(thread){
 		thread = checkThread(thread);
 
-		var func = function (args){
-				console.log('Subscriber says: Got a message, it said: '+args.join(' '));
-			};
-		session.subscribe(thread, func).then(function (){
+		session.subscribe(thread, function (args){
+			console.log('Subscriber says: Got a message, it said: '+args.join(' '));
+		}).then(function (){
 			console.log('Subscriber says: Yes, subscribed to '+thread+'!');
 		}, function (error){
 			console.log('Subscriber says: Oh no, subscribing to '+thread+' went wrong: '+error.args[0]);
@@ -169,12 +168,12 @@ var wsWorkshop = (function (){
 })();
 
 function login(user, password){
-	var url = 'http://localhost:8014/login';
+	const url = 'http://localhost:8014/login';
 
-	var headers = new Headers();
+	const headers = new Headers();
 	headers.append('Content-Type','application/json');
 
-	var options = {
+	const options = {
 		method: 'POST',
 		headers: headers,
 		cors: 'no-cors',

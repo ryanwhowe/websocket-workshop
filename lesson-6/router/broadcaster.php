@@ -3,6 +3,7 @@
  * Copy of the authenticator with a few changes
  */
 
+use React\EventLoop\Factory;
 use Thruway\ClientSession;
 
 require __DIR__.'/../vendor/autoload.php';
@@ -12,7 +13,7 @@ define('LOG_NAME', 'Broadcaster');
 require 'utilities.php';
 require 'connection.php';
 
-$loop = \React\EventLoop\Factory::create();
+$loop = Factory::create();
 
 $loop->addPeriodicTimer(30, function (){
 	terminal_log("Still running, next update in 5 minutes...");

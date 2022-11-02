@@ -1,10 +1,10 @@
 console.log("Welcome to lesson 2");
 
-var wsWorkshop = (function (){
-	var session, connection;
+const wsWorkshop = (function (){
+	let session, connection;
 	const url = "ws://localhost:8002/ws";
 
-	var config = {
+	let config = {
 		realm: 'ws-workshop',
 		authmethods: ['anonymous']
 	};
@@ -76,8 +76,8 @@ var wsWorkshop = (function (){
 		if (!userConfig.authmethods || userConfig.authmethods.length<1){
 			throw "You need to pass a valid array of strings as the 'auth' field";
 		}
-		userConfig.authmethods.map(function(method){
-			if (['ticket', 'wampcra'].indexOf(method)>-1){
+		userConfig.authmethods.map(function (method){
+			if (['ticket', 'wampcra'].indexOf(method)> -1){
 				if (!userConfig.authid){
 					throw "You must specify a truthy value as the 'authid' field";
 				}
@@ -107,6 +107,7 @@ var wsWorkshop = (function (){
 			console.log("Already connected, use .connectAgain method to close and reconnect");
 			return;
 		}
+
 		const realm = config.realm;
 		const auth = config.authmethods;
 
