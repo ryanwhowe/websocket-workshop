@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo "Wiping database files (may need sudo as they are created by a mounted docker volume)"
-rm -f db/**/data/*.json
+rm -f db/**/{data,cache}/*.json

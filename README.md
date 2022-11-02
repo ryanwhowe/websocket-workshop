@@ -90,7 +90,7 @@ session.publish('test', ['abc'], {}, {exclude_me: false});
 
 There's a bit more needed to get the basic working here. The first parameter again is the topic name,
 which again is just a simple string. The next parameter is an array (list) of messages to send. Your
-messages can include arrays or objects but they'll be reduced to contents which can be transported in
+messages can include arrays or objects, but they'll be reduced to contents which can be transported in
 serialized form.
 
 You can subscribe to any topic even if nobody will ever subscribe to it, and you can publish to topics
@@ -99,7 +99,7 @@ receive it, have you really published? (yes because the logs say so))
 
 Try the same processes again whilst watching the crossbar logs; you'll see some more info about what is
 going on under the hood - namely that crossbar has its own clients publishing and subscribing to its own
-events for the purpose of it's internal operations (and logging) which is pretty cool.
+events for the purpose of its internal operations (and logging) which is pretty cool.
 
 #### Remote Procedure Call (RPC)
 
@@ -154,7 +154,7 @@ The previous commands were verbose so they've been included in a helper object. 
 
 We now also have the option to change the realm to which we are connected. Call `wsWorkshop.setRealm()`
 with a string argument and then `wsWorkshop.connectAgain()` to close the connection and connect again
-with a new realm (or just modify the script in `public/2/script.js` and refresh the page.
+with a new realm (or just modify the script in `public/2/script.js` and refresh the page).
 
 If you try this with anything other than "ws-workshop" you'll get an error. Let's look at the
 Crossbar config in `lesson-2/router/.crossbar/config.json`
@@ -293,7 +293,7 @@ docker-compose logs -f php_3
 ```
 
 There is also a shortcut at `bin/run-php` which takes a single argument, the lesson number, and on running
-will restart the container then subsequently follow it's logs. Exit the log follow with `Ctrl+C`
+will restart the container then subsequently follow its logs. Exit the log follow with `Ctrl+C`
 
 As fun as the loop is we need some content. Let's make a websocket connection. For this we're going to use
 a stack of PHP libraries that implement various parts of the process:
@@ -380,12 +380,12 @@ $connection->on('close', function(){
 
 If you restart and view logs again you should see the connection open. It's worth mentioning that whilst
 we removed the rather blunt `while (true)` loop there's still an event loop happening. When Thruway starts
-a connection it uses the React PHP Loop factory to create a loop that the connection runs inside of.
+a connection it uses the React PHP Loop factory to create a loop that the connection runs inside.
 
 This is how the library can be "non-blocking" - we can publish a message whilst also waiting to respond
 to a call whilst at the same time handling incoming subscriptions. The event loop takes care of that for us.
 We do need to be careful to avoid calling blocking code (e.g. file_get_contents) inside a handler, as this will
-block all other callbacks until complete (this may be migitated if we use Fibers from PHP 8.2)
+block all other callbacks until complete (this may be migrated if we use Fibers from PHP 8.2)
 
 Let's listen to what our JavaScript user is saying by also adding this code inside the on(open) callback:
 
@@ -543,7 +543,7 @@ We can delete the "guest" role from our ws-workshop realm and instead add these
 
 ```
 {
-  "name": "type1",
+  "name": "basic-user",
   "permissions": [
     {
       "uri": "workshop.",
@@ -568,7 +568,7 @@ We can delete the "guest" role from our ws-workshop realm and instead add these
 ```
 
 You'll see the latter role has an odd feature which is that it has no permissions. This
-is deliberate and allows us to ensure an unkown user cannot get a role with permissions
+is deliberate and allows us to ensure an unknown user cannot get a role with permissions
 even should they find a hole in the WAMPCRA authentication process.
 
 We now have everything set up to start up our crossbar server. Run `bin/run-crossbar 4`
@@ -580,8 +580,8 @@ wsWorkshop.setAuth('whatever', 'wont-work').connect()
 ```
 
 Let's build an authenticator in PHP. Firstly we need to grab the arguments we passed to
-the worker via the command line. Add this above the WAMPCRA function that is already copied
-in from lesson 3:
+the worker via the command line. We have the basis for this at `lesson-4/router/authenticator.php`
+and we can start to add to this. Above the "WAMPCRA" function (that we saw in lesson 3) copy this:
 
 ```
 [$url, $realm, $user, $password] = array_slice($argv, 1);
@@ -613,14 +613,15 @@ $connection->on('close', function (){
 $connection->open();
 ```
 
-Now we have the basic client similar to lesson 3. Inside the connection we can register a procedure
+Now we have the basic client similar to lesson 3. Inside the `on(open)` we can register a procedure
 that matches the name we supplied in the authentication config:
 
 ```
 $name = 'workshop.auth';
 $session->register($name, function (){
+    // This is the "yolo" authenticator - it lets anyone in
     return [
-        'role' => 'type1',
+        'role' => 'basic-user',
         'secret' => 'abc',
     ];
 })->then(function () use ($name){
@@ -628,24 +629,32 @@ $session->register($name, function (){
 });
 ```
 
-Now we can try connecting with any user name and the secret "abc". Restart with `bin/run-crossbar 4`:
+Now we can try connecting with any user name and the secret "abc". Restart with `bin/run-crossbar 4`
+(you can add the arg `skip` to block all the noise from crossbar, though you might find it interesting
+to see how it talks to the authenticator the first few times):
 
 ```
 wsWorkshop.setAuth('whatever', 'abc').connect()
 ```
 
 We should now be connected to the server, but that wasn't very dynamic. We can do more with this by
-checking the arguments passed when the auth procedure is called:
+checking the arguments passed when the auth procedure is called, replacing what we currently have with:
 
 ```
-$session->register($name, function ($args){
+function ($args){
     $realm = array_shift($args);
     $authid = array_shift($args);
     $details = array_shift($args);
     $session_id = $details->session;
 
     terminal_log("Received auth request for user '$authid' on realm '$realm'. Crossbar session was '$session_id'");
-    ...
+ 
+    // This is still "yolo" but we'll remove it in a moment
+    return [
+        'role' => 'basic-user',
+        'secret' => 'abc',
+    ];
+}
 ```
 
 We can restart and run here to see the data provided. The session ID will be used more later but for now is useful
@@ -656,7 +665,7 @@ we can then use this to supply authentication info:
 function token_from_user(string $name){
 	switch ($name){
 		case 'alice':
-			return ['changeme', 'type1'];
+			return ['changeme', 'basic-user'];
 	}
 
 	throw new Exception("No user found with name '$name'");
@@ -667,7 +676,7 @@ Then also inside the authenticator (after the call to `terminal_log`) replace th
 
 ```
 try {
-    list($token, $role) = token_from_user($authid);
+    [$token, $role] = token_from_user($authid);
 }
 catch (Exception $e) {
     terminal_log("Error: {$e->getMessage()}");
@@ -687,7 +696,7 @@ return [
 ];
 ```
 
-Once more we can restart ('bin/run-crossbar 4`) and then in the browser run:
+Once more we can restart (`bin/run-crossbar 4`) and then in the browser run:
 
 ```
 wsWorkshop.setAuth('alice', 'changeme').connect()
@@ -712,11 +721,11 @@ permission to our authenticator role we can just widen the scope a little. Chang
 
 This allows the authenticator to register any procedure in the namespace, which will be useful later
 
-Then following the "type1" role we can add another role:
+Then following the "basic-user" role we can add another role:
 
 ```
 {
-  "name": "type2",
+  "name": "permissions-user",
   "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
@@ -726,16 +735,16 @@ Then following the "type1" role we can add another role:
 ```
 
 Where you can see we once again declare an RPC URI but this time as a new key `authorizer`.
-In order to handle the type2 role we want to add another user, Bob, to our users
-function (inside the `switch` statement):
+In order to handle the `permissions-user` role we want to add another user, Bob, to our users
+function (inside the `switch` statement within `token_from_user()`):
 
 ```
 case 'bob':
-    return ['password123', 'type2'];
+    return ['password123', 'permissions-user'];
 ```
 
 Now inside the on connection function of the authenticator script we can add another register
-prodecure step, this time for permissions. Rather than build it bit by bit we're going to copy
+procedure step, this time for permissions. Rather than build it bit by bit we're going to copy
 in the whole block and can then talk about it more
 
 ```
@@ -775,7 +784,8 @@ we follow the rules we've set for ourselves in the above permissions procedure a
 wsWorkshop.sub(null, 'workshop.chat')
 ```
 
-Then it will work for us correctly.
+Then our subscribe operation will succeed. We can now dynamically allow users to subscribe or send messages
+to given topics, giving us much more granularity in how we provision our applications.
 
 ### Lesson 4 Practical - Integration with existing auth mechanisms
 
@@ -798,7 +808,7 @@ roles if needed later.
 
 ```
 {
-  "name": "type3",
+  "name": "app-user",
   "authorizer": "workshop.permissions",
   "disclose": {
     "caller": true,
@@ -816,12 +826,12 @@ $token = http_get($url);
 $token = trim($token);
 
 if ($token){
-    return [$token, 'type3'];
+    return [$token, 'app-user'];
 }
 ```
 
 Now we're ready. Restart crossbar (`bin/run-crossbar 4`) and then in the browser call
-`login(user, password)` filling in those two paramters with the user you created and the password
+`login(user, password)` filling in those two parameters with the user you created and the password
 which was returned. You should see a log that it was successful If you open your browser network tab
 you can also see the token which has been returned. Now your user has a shared secret with the crossbar
 service without disclosing their password to the WAMP router or their token having to go across
@@ -982,7 +992,7 @@ terminal_log("Saved message via HTTP");
 ```
 
 Now when users publish a message we should see our API get called, and can see saved messages in `db/messages/data`
-as individual JSON files, recorded with the correct user name and thread name. In the app code for this
+as individual JSON files, recorded with the correct username and thread name. In the app code for this
 the same permissions have been used, though given the restrictions on who can publish via websockets and the
 app port block this actually should not be necessary.
 
@@ -1047,7 +1057,7 @@ delving too far into its operation. A better way to handle this would be a singl
 more effectively handle connections, but be careful about assuming a single object created once
 will work everywhere in an application which may live days or weeks rather than half a second._
 
-Now that we have a list of subscribers we can let users call this. We'll keep it simple at
+Now we have a list of subscribers we can let users call this. We'll keep it simple at
 this stage and let any user call it, rather than restricting to thread access. The authenticator
 will need to register this procedure:
 
@@ -1215,7 +1225,7 @@ an easy fix because our listening code from lesson 5 has been neatly refactored 
 into `lesson-6/router/listener.php`
 
 Check the `store_message()` function which carries out the HTTP call. We no longer want to
-block the listener when carrying out this call so we replace the whole inside of that message
+block the listener when carrying out this call, so we replace the whole inside of that message
 with the following code.
 
 ```
@@ -1274,7 +1284,7 @@ _Fun experiment, on the slides, at this point_
 
 ### Lesson 6 Practical - Messaging into websockets using ZMQ
 
-Services outside of websockets may want to communicate with users in a websocket system. In a chat
+Services outside websockets may want to communicate with users in a websocket system. In a chat
 system it might be the case people can live chat but also send emails which get parsed and
 messaged to users. Or user actions on one part of a web route might need to relay to a control
 panel or dashboard.
@@ -1335,7 +1345,7 @@ Firstly near the bottom of `lesson-6/router/.crossbar/config.json` we add anothe
 }
 ```
 
-As with the authenticator we add a WAMPCRA key with the user name, static secret and role:
+As with the authenticator we add a WAMPCRA key with the username, static secret and role:
 
 ```
 "broadcaster": {
@@ -1402,7 +1412,7 @@ $session->publish('workshop.broadcast', [$message]);
 ```
 
 We're now able to broadcast and with just a few small changes our users can receive them as well.
-Firstly assuming we're still testing with users who gain their permisisons from `register_permissions()`
+Firstly assuming we're still testing with users who gain their permissions from `register_permissions()`
 in `lesson-6/router/auth.php` we can add the following at line 83 (just below where we allow them
 to call "workshop.subscribers" from lesson 5):
 
