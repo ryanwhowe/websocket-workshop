@@ -384,8 +384,10 @@ a connection it uses the React PHP Loop factory to create a loop that the connec
 
 This is how the library can be "non-blocking" - we can publish a message whilst also waiting to respond
 to a call whilst at the same time handling incoming subscriptions. The event loop takes care of that for us.
+We do need to be careful to avoid calling blocking code (e.g. file_get_contents) inside a handler, as this will
+block all other callbacks until complete (this may be migitated if we use Fibers from PHP 8.2)
 
-Let's listen to what our JavaScript user is saying:
+Let's listen to what our JavaScript user is saying by also adding this code inside the on(open) callback:
 
 ```
 $topic = 'test';
@@ -537,8 +539,7 @@ for this next step.
 ]
 ```
 
-We can delete the "guest" role from our ws-workshop realm and instead add these (the role names
-might make sense for British history buffs later...)
+We can delete the "guest" role from our ws-workshop realm and instead add these
 
 ```
 {
