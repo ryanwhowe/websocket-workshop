@@ -1437,7 +1437,4 @@ Here are a few selections to continue the learning or act as more of a reference
 * [Websocket protocol](https://www.linode.com/docs/development/introduction-to-websockets/) - at a lower
    level than crossbar, this guide from Linode goes over the basics of the connection and data transfer
    components in a websocket system
-* [Callstats](https://www.callstats.io/) - if you're using WebRTC in production then monitoring is key
-   and callstats is a quality service. It's high price is reasonable given the complexity of the WebRTC
-   landscape
 * [React PHP](https://reactphp.org/) - also lists Ratchet and Thruway components
