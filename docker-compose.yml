@@ -121,13 +121,14 @@ services:
     env_file:
       - ./docker/zmq.env
     command: php -S 0.0.0.0:80 -t /app/
-  zmq_6:
-    build: docker/php-zmq
-    image: websocket-workshop/php-zmq
-    volumes:
-      - ./lesson-6/zmq:/app
-      - ./db:/db
-    environment:
-      - TZ=Europe/London
-    env_file:
-      - ./docker/zmq.env
+# Uncomment this if we make it to step 6
+#  zmq_6:
+#    build: docker/php-zmq
+#    image: websocket-workshop/php-zmq
+#    volumes:
+#      - ./lesson-6/zmq:/app
+#      - ./db:/db
+#    environment:
+#      - TZ=Europe/London
+#    env_file:
+#      - ./docker/zmq.env
